@@ -4,13 +4,11 @@ import json
 import tornado.web
 
 from minion.app import app
+from minion.config import config
 import minion.helpers as h
 from minion.subprocess import manager
 from minion.watchers import RsyncWatcher
 
-
-config = {'debug': False,
-          'authkey': 'qwerty'}
 
 @h.route(app, r'/')
 class SomeHandler(tornado.web.RequestHandler):
@@ -22,7 +20,8 @@ class AuthenticationRequestHandler(tornado.web.RequestHandler):
     def is_authenticated(self):
         if config['debug']:
             return True
-        return self.request.headers.get('X-Auth', '') == config['authkey']
+        return (self.request.headers.get('X-Auth', '') ==
+                config['common']['authkey'])
 
     @staticmethod
     def auth_required(method):
