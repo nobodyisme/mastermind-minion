@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+from opster import command
+import tornado.ioloop
+
+from minion import app
+from minion.config import config
+from minion import daemon
+from minion import handlers
+from minion.logger import logger
+
+
+@command(usage='[--daemonize] [--pidfile PIDFILE]')
+def main(daemonize=('', False, 'Daemonize this process'),
+         pidfile=('', None, 'Use this pidfile')):
+    """This script starts mastermind minion daemon
+       for remote task execution and instance stats retrieval"""
+    if daemonize:
+        logger.debug('Daemon initialization')
+        d = daemon.Daemon(pidfile or config['common']['pidfile'])
+        d.run = run
+        d.start()
+    else:
+        run()
+
+
+def run():
+    logger.info('Starting event loop...')
+    tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    main.command()

@@ -1,9 +1,0 @@
-#!/usr/bin/env python
-import tornado.ioloop
-
-from minion import app
-from minion import handlers
-
-
-if __name__ == '__main__':
-    tornado.ioloop.IOLoop.instance().start()
