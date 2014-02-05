@@ -1,9 +1,11 @@
-from tornado.process import Subprocess
+import time
 
 
 class ProgressWatcher(object):
     def __init__(self, subprocess):
         self.progress = 0.0
+        self.start_ts = int(time.time())
+        self.finish_ts = None
 
         subprocess.stdout.read_until_close(self.feed,
                                            streaming_callback=self.feed)
@@ -20,6 +22,7 @@ class ProgressWatcher(object):
         self.exit = True
         self.exit_code = code
         self.progress = 1.0
+        self.finish_ts = int(time.time())
 
     @property
     def exit_message(self):
@@ -39,4 +42,6 @@ class ProgressWatcher(object):
             'progress': self.progress,
             'exit_code': self.exit_code,
             'exit_message': self.exit_message,
+            'start_ts': self.start_ts,
+            'finish_ts': self.finish_ts,
         }

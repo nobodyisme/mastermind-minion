@@ -1,12 +1,5 @@
 #!/usr/bin/env python
-import os
 import re
-import time
-from datetime import datetime
-
-import tornado
-from tornado.process import Subprocess, PipeIOStream
-from tornado.ioloop import IOLoop
 
 from minion.watchers.base import ProgressWatcher
 

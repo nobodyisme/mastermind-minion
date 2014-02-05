@@ -25,5 +25,8 @@ class SubprocessManager(object):
     def status(self, uid):
         return self.subprocesses[uid].status()
 
+    def keys(self):
+        return self.subprocesses.keys()
+
 
 manager = SubprocessManager()
