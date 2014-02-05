@@ -7,6 +7,7 @@ from minion.app import app
 from minion.config import config
 import minion.helpers as h
 from minion.subprocess import manager
+from minion.templates import loader
 from minion.watchers import RsyncWatcher
 
 
@@ -18,7 +19,7 @@ class SomeHandler(tornado.web.RequestHandler):
 
 class AuthenticationRequestHandler(tornado.web.RequestHandler):
     def is_authenticated(self):
-        if config['debug']:
+        if config['common']['debug'] == 'True':
             return True
         return (self.request.headers.get('X-Auth', '') ==
                 config['common']['authkey'])

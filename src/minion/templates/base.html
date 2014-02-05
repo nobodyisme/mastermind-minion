@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+    <title>{% block title %}{% end %} - Minion</title>
+    {% end %}
+</head>
+<body>
+<!--
+    <div class="oneBorder"></div>
+    <div class="twoBorder"></div>
+    <div class="threeBorder"></div>
+-->
+    <div class="content">{% block content %}{% end %}</div>
+    <div id="footer">
+        {% block footer %}
+        {% end %}
+    </div>
+
+
+    {% block js %}{% end %}
+
+
+</body>
+</html>
