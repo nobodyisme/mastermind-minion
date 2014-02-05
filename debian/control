@@ -1,0 +1,25 @@
+Source: mastermind-minion
+Section: net
+Priority: extra
+Maintainer: Andrey Vasilenkov <indigo@yandex-team.ru>
+Build-Depends: debhelper (>= 8.0.0), cdbs, python, python-central
+Standards-Version: 3.9.2
+Homepage: https://github.com/nobodyisme/mastermind-minion
+Vcs-Git: git://github.com/nobodyisme/mastermind-minion.git
+XS-Python-Version: >= 2.6
+
+Package: mastermind-minion
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
+ python-tornado
+XB-Python-Version: >= 2.6
+Description: Elliptics instance resident daemon designated for mastermind
+ commands execution
+
+Package: mastermind-minion-utils
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
+ mastermind-minion,
+ python-opster
+XB-Python-Version: >= 2.6
+Description: Mastermind minion daemon start script
