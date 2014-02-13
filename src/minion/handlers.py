@@ -22,7 +22,7 @@ class AuthenticationRequestHandler(tornado.web.RequestHandler):
         if config['common']['debug'] == 'True':
             return True
         return (self.request.headers.get('X-Auth', '') ==
-                config['common']['authkey'])
+                config['auth']['key'])
 
     @staticmethod
     def auth_required(method):

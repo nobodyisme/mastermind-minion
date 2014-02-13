@@ -24,8 +24,7 @@ logging_config = JsonConfig(log_config_path)
 setup_logger(logging_config['logging'])
 
 _cp = ConfigParser()
-_cp.read(['/etc/elliptics/mastermind-minion-default.ini',
-          '/etc/elliptics/mastermind-minion.ini'])
+_cp.read(['/etc/elliptics/mastermind-minion/mastermind-minion-default.conf',
+          '/etc/elliptics/mastermind-minion/mastermind-minion.conf'])
 
 config = _cp._sections
-
