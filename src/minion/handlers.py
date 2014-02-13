@@ -43,15 +43,11 @@ def api_response(method):
         try:
             res = method(self, *args, **kwargs)
         except Exception as e:
-            response = {
-                'status': 'error',
-                'error': str(e),
-            }
+            response = {'status': 'error',
+                        'error': str(e)}
         else:
-            response = {
-                'status': 'success',
-                'response': res,
-            }
+            response = {'status': 'success',
+                        'response': res}
         self.write(json.dumps(response))
     return wrapped
 
