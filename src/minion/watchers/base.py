@@ -12,6 +12,8 @@ class ProgressWatcher(object):
         subprocess.set_exit_callback(self.exit)
         self.subprocess = subprocess
 
+        self.success_cb = None
+
         self.exit = False
         self.exit_code = None
 
@@ -23,6 +25,9 @@ class ProgressWatcher(object):
         self.exit_code = code
         self.progress = 1.0
         self.finish_ts = int(time.time())
+
+        if self.success_cb and self.exit_code == 0:
+            self.success_cb()
 
     @property
     def exit_message(self):
@@ -38,10 +43,12 @@ class ProgressWatcher(object):
 
     def status(self):
         return {
-            'pid': self.subprocess.pid,
             'progress': self.progress,
             'exit_code': self.exit_code,
             'exit_message': self.exit_message,
             'start_ts': self.start_ts,
             'finish_ts': self.finish_ts,
         }
+
+    def on_success(self, cb):
+        self.success_cb = cb

@@ -6,7 +6,8 @@ import tornado.web
 from minion.app import app
 from minion.config import config
 import minion.helpers as h
-from minion.subprocess import manager
+from minion.logger import logger
+from minion.subprocess.manager import manager
 from minion.templates import loader
 from minion.watchers import RsyncWatcher
 
@@ -59,7 +60,8 @@ def api_response(method):
 class RsyncStartHandler(AuthenticationRequestHandler):
     def post(self):
         cmd = self.get_argument('command')
-        uid = manager.run(cmd, RsyncWatcher)
+        params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
+        uid = manager.run(cmd, params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -75,7 +77,7 @@ class RsyncStatusHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def get(self, uid):
-        return manager.status(uid)
+        return {uid: manager.status(uid)}
 
 
 @h.route(app, r'/rsync/list/')
