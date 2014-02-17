@@ -15,6 +15,9 @@ class RsyncSubprocess(BaseSubprocess):
 
     def __init__(self, cmd, params=None, io_loop=IOLoop.instance()):
         super(RsyncSubprocess, self).__init__(cmd, params=params, io_loop=io_loop)
+        if not 'group' in params:
+            raise ValueError('Parameter "group" is required')
+        self.group = params['group']
         if self.RSYNC_PASSWORD:
             self.env['RSYNC_PASSWORD'] = self.RSYNC_PASSWORD
 
@@ -25,8 +28,13 @@ class RsyncSubprocess(BaseSubprocess):
         super(RsyncSubprocess, self).run()
         self.watcher.on_success(self.create_group_file)
 
+    def status(self):
+        res = super(RsyncSubprocess, self).status()
+        res['group'] = self.group
+        return res
+
     def create_group_file(self):
-        if self.params.get('group'):
+        if self.params.get('group_file'):
             try:
                 group = str(int(self.params.get('group')))
                 path = self.params.get('group_file')
