@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import traceback
+
 from opster import command
 import tornado.ioloop
 
@@ -16,9 +18,15 @@ def main(daemonize=('', False, 'Daemonize this process'),
        for remote task execution and instance stats retrieval"""
     if daemonize:
         logger.debug('Daemon initialization')
-        d = daemon.Daemon(pidfile or config['common']['pidfile'])
-        d.run = run
-        d.start()
+        try:
+            d = daemon.Daemon(pidfile or config['common']['pidfile'])
+            d.run = run
+            logger.debug('Starting daemon')
+            d.start()
+        except Exception as e:
+            logger.error('Failed to start daemon: {0}'.format(e))
+            logger.error(traceback.format_exc())
+            return 1
     else:
         run()
 
