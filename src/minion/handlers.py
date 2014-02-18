@@ -12,10 +12,10 @@ from minion.templates import loader
 from minion.watchers import RsyncWatcher
 
 
-@h.route(app, r'/')
-class SomeHandler(tornado.web.RequestHandler):
+@h.route(app, r'/ping/')
+class PingHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write('Whoa...')
+        self.write('OK')
 
 
 class AuthenticationRequestHandler(tornado.web.RequestHandler):
@@ -54,6 +54,7 @@ def api_response(method):
 
 @h.route(app, r'/rsync/start/', name='start')
 class RsyncStartHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
     def post(self):
         cmd = self.get_argument('command')
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
