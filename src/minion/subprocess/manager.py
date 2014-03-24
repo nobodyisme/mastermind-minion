@@ -25,6 +25,7 @@ class SubprocessManager(object):
 
         if cmd[0] == 'rsync':
             Subprocess = RsyncSubprocess
+            self.check(params.get('group', 0))
         else:
             raise ValueError('Unsupported command: {0}'.format(cmd[0]))
 
@@ -41,6 +42,15 @@ class SubprocessManager(object):
 
     def keys(self):
         return self.subprocesses.keys()
+
+    def check(self, group):
+        for subprocess in self.subprocesses.itervalues():
+            if not isinstance(subprocess, RsyncSubprocess):
+                continue
+            status = subprocess.status()
+            if status['group'] == group and status['progress'] < 1.0:
+                raise ValueError('Task for group {0} is already running, '
+                    'pid: {1}'.format(group, status['pid']))
 
 
 manager = SubprocessManager()

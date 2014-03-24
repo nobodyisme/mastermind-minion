@@ -55,6 +55,7 @@ def api_response(method):
 @h.route(app, r'/rsync/start/', name='start')
 class RsyncStartHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
+    @api_response
     def post(self):
         cmd = self.get_argument('command')
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
