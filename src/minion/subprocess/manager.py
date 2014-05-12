@@ -8,12 +8,26 @@ from tornado.ioloop import IOLoop
 
 from minion.logger import logger
 from minion.subprocess.rsync import RsyncSubprocess
+from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
+from minion.subprocess.ubic import UbicSubprocess
 
 
 class SubprocessManager(object):
     def __init__(self, ioloop=IOLoop.instance()):
         self.subprocesses = {}
         self.ioloop = ioloop
+
+    def get_subprocess(self, cmd):
+        if cmd[0] == 'rsync':
+            Subprocess = RsyncSubprocess
+            self.check(params.get('group', 0))
+        elif cmd[0] == 'dnet_ioclient':
+            Subprocess = DnetIoclientSubprocess
+        elif cmd[0] == 'ubic':
+            Subprocess = UbicSubprocess
+        else:
+            raise ValueError('Unsupported command: {0}'.format(cmd[0]))
+        return Subprocess
 
     def run(self, command, params):
         logger.info('command to execute: {0}'.format(command))
@@ -23,12 +37,7 @@ class SubprocessManager(object):
                if isinstance(command, basestring) else
                command)
 
-        if cmd[0] == 'rsync':
-            Subprocess = RsyncSubprocess
-            self.check(params.get('group', 0))
-        else:
-            raise ValueError('Unsupported command: {0}'.format(cmd[0]))
-
+        Subprocess = self.get_subprocess(cmd)
         sub = Subprocess(cmd, params=params)
         sub.run()
 

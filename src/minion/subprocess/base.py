@@ -19,6 +19,7 @@ class BaseSubprocess(object):
     def run(self):
         self.process = Subprocess(self.cmd,
                                   stdout=Subprocess.STREAM,
+                                  stderr=Subprocess.STREAM,
                                   env=self.env,
                                   io_loop=self.io_loop)
         self.watcher = self.watch()

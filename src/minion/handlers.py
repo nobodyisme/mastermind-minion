@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+import traceback
 
 import tornado.web
 
@@ -43,6 +44,7 @@ def api_response(method):
         try:
             res = method(self, *args, **kwargs)
         except Exception as e:
+            logger.error('{0}: {1}'.format(e, traceback.format_exc(e)))
             response = {'status': 'error',
                         'error': str(e)}
         else:
@@ -76,6 +78,20 @@ class RsyncStatusHandler(AuthenticationRequestHandler):
     @api_response
     def get(self, uid):
         return {uid: manager.status(uid)}
+
+
+@h.route(app, r'/node/shutdown/', name='node_shutdown')
+class NodeShutdownHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
+    @api_response
+    def post(self):
+        cmd = self.get_argument('command')
+        params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
+        print params
+        uid = manager.run(cmd, params)
+        self.set_status(302)
+        print uid, self.reverse_url('status', uid)
+        self.add_header('Location', self.reverse_url('status', uid))
 
 
 @h.route(app, r'/rsync/list/')

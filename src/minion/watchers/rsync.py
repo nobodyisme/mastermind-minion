@@ -12,11 +12,12 @@ class RsyncWatcher(ProgressWatcher):
     def __init__(self, subprocess):
         super(RsyncWatcher, self).__init__(subprocess)
         self.current_file = 0
-        self.total_files = 100  # first estimation of total files num
+        self.total_files = 20  # first estimation of total files num
 
         self.buf = ''
 
     def feed(self, s):
+        super(RsyncWatcher, self).feed(s)
         if self.exit:
             return
         data = self.SPLIT_RE.split(s)
