@@ -17,7 +17,7 @@ class SubprocessManager(object):
         self.subprocesses = {}
         self.ioloop = ioloop
 
-    def get_subprocess(self, cmd):
+    def get_subprocess(self, cmd, params):
         if cmd[0] == 'rsync':
             Subprocess = RsyncSubprocess
             self.check(params.get('group', 0))
@@ -37,7 +37,7 @@ class SubprocessManager(object):
                if isinstance(command, basestring) else
                command)
 
-        Subprocess = self.get_subprocess(cmd)
+        Subprocess = self.get_subprocess(cmd, params)
         sub = Subprocess(cmd, params=params)
         sub.run()
 
