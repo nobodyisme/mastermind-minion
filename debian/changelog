@@ -1,3 +1,9 @@
+mastermind-minion (0.5) unstable; urgency=low
+
+  * Fix for subrocess manager group checking
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 02 Jun 2014 14:29:39 +0400
+
 mastermind-minion (0.4) unstable; urgency=low
 
   * Fix for suprocess classes
