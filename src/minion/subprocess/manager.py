@@ -31,6 +31,7 @@ class SubprocessManager(object):
 
     def run(self, command, params):
         logger.info('command to execute: {0}'.format(command))
+        logger.info('parameters supplied: {0}'.format(params))
         if isinstance(command, unicode):
             command = command.encode('utf-8')
         cmd = (shlex.split(command)
