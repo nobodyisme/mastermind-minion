@@ -50,3 +50,6 @@ class RsyncSubprocess(BaseSubprocess):
             else:
                 logger.info('Successfully created group file '
                             'for group {0}'.format(group))
+        else:
+            logger.info('Group file creation was not requested for '
+                'group {0}'.format(self.params.get('group')))
