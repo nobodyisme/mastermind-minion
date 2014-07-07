@@ -28,7 +28,7 @@ class UbicSubprocess(BaseSubprocess):
         if self.params.get('group_file_marker'):
             try:
                 group = str(int(self.params.get('group')))
-                path = self.params.get('group_file_marker')
+                path = self.params['group_file_marker'].format(group_id=group)
                 dirname = os.path.dirname(path)
                 if not os.path.exists(dirname):
                     os.makedirs(dirname, 0755)

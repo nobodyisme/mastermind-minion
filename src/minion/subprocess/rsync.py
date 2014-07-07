@@ -37,7 +37,7 @@ class RsyncSubprocess(BaseSubprocess):
         if self.params.get('group_file'):
             try:
                 group = str(int(self.params.get('group')))
-                path = self.params.get('group_file')
+                path = self.params['group_file'].format(group_id=group)
                 if os.path.exists(path):
                     os.rename(path, path + '.bak')
                 dirname = os.path.dirname(path)
