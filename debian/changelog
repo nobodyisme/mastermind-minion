@@ -1,3 +1,9 @@
+mastermind-minion (0.8) unstable; urgency=low
+
+  * Group file option and group file marker option can now be parametrized
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 07 Jul 2014 18:44:42 +0400
+
 mastermind-minion (0.7) unstable; urgency=low
 
   * Ubic commands can optionally create marker files with group id
