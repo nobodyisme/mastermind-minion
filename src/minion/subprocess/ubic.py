@@ -31,13 +31,15 @@ class UbicSubprocess(BaseSubprocess):
     def create_group_file_marker(self):
         if self.params.get('group_file_marker'):
             try:
-                group = str(int(self.params.get('group')))
+                group = (str(int(self.params.get('group')))
+                         if self.params.get('group') else
+                         '')
                 path = self.params['group_file_marker'].format(group_id=group)
                 dirname = os.path.dirname(path)
                 if not os.path.exists(dirname):
                     os.makedirs(dirname, 0755)
                 with open(path, 'w') as f:
-                    f.write(group + '\n')
+                    f.write(group)
             except Exception as e:
                 logger.exception('Failed to create group file marker: {0}'.format(e))
             else:

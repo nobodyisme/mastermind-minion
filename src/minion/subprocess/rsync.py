@@ -44,7 +44,7 @@ class RsyncSubprocess(BaseSubprocess):
                 if not os.path.exists(dirname):
                     os.makedirs(dirname, 0755)
                 with open(path, 'w') as f:
-                    f.write(group + '\n')
+                    f.write(group)
             except Exception as e:
                 logger.exception('Failed to create group file: {0}'.format(e))
             else:
