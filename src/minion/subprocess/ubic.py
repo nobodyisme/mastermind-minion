@@ -1,5 +1,9 @@
+import os
+import os.path
+
 from tornado.ioloop import IOLoop
 
+from minion.logger import logger
 from minion.subprocess.base import BaseSubprocess
 from minion.watchers.base import ProgressWatcher
 
