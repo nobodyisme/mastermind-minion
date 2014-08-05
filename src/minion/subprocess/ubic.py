@@ -48,3 +48,16 @@ class UbicSubprocess(BaseSubprocess):
         else:
             logger.info('Group file marker creation was not requested for '
                 'group {0}'.format(self.params.get('group')))
+
+        if self.params.get('remove_group_file'):
+            logger.info('Removing group file {0}'.format(self.params['remove_group_file']))
+            try:
+                os.remove(self.params['remove_group_file'])
+            except Exception as e:
+                logger.exception('Failed to remove group file: {0}'.format(e))
+            else:
+                logger.info('Successfully removed group '
+                            'file {0}'.format(self.params['remove_group_file']))
+        else:
+            logger.info('Group file removal was not requested for '
+                'group {0}'.format(self.params.get('group')))
