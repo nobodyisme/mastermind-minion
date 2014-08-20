@@ -1,3 +1,9 @@
+mastermind-minion (0.12) unstable; urgency=low
+
+  * Optional move tasks for ubic subprocesses
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 20 Aug 2014 13:24:43 +0400
+
 mastermind-minion (0.11) unstable; urgency=low
 
   * Optional removal of group files for ubic commands
