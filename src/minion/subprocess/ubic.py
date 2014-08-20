@@ -62,13 +62,12 @@ class UbicSubprocess(BaseSubprocess):
             logger.info('Group file removal was not requested for '
                 'group {0}'.format(self.params.get('group')))
 
-        if self.params.get('move'):
-            for move_task in self.params['move']:
-                try:
-                    os.rename(move_task['src'], move_task['dst'])
-                except Exception as e:
-                    logger.exception('Failed to execute move task: {0}'.format(
-                        move_task))
-                else:
-                    logger.info('Successfully performed move task: {0}'.format(
-                        move_task))
+        if self.params.get('move_dst') and self.params.get('move_src'):
+            try:
+                os.rename(self.params['move_src'], self.params['move_dst'])
+            except Exception as e:
+                logger.exception('Failed to execute move task: {0} to {1}'.format(
+                    self.params['move_src'], self.params['move_dst']))
+            else:
+                logger.info('Successfully performed move task: {0} to {1}'.format(
+                    self.params['move_src'], self.params['move_dst']))
