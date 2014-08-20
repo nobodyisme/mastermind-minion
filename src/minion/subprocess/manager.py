@@ -9,6 +9,7 @@ from tornado.ioloop import IOLoop
 from minion.logger import logger
 from minion.subprocess.rsync import RsyncSubprocess
 from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
+from minion.subprocess.dnet_client import DnetClientSubprocess
 from minion.subprocess.ubic import UbicSubprocess
 
 
@@ -23,6 +24,8 @@ class SubprocessManager(object):
             self.check(params.get('group', 0))
         elif cmd[0] == 'dnet_ioclient':
             Subprocess = DnetIoclientSubprocess
+        elif cmd[0] == 'dnet_client':
+            Subprocess = DnetClientSubprocess
         elif cmd[0] == 'ubic':
             Subprocess = UbicSubprocess
         else:
