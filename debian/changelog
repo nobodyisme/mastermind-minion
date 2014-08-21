@@ -1,3 +1,9 @@
+mastermind-minion (0.15) unstable; urgency=low
+
+  * Fix for dnet client command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Thu, 21 Aug 2014 18:16:57 +0400
+
 mastermind-minion (0.14) unstable; urgency=low
 
   * Dnet client commands
