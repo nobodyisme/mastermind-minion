@@ -12,9 +12,10 @@ class UbicSubprocess(BaseSubprocess):
 
     def __init__(self, cmd, params=None, io_loop=IOLoop.instance()):
         super(UbicSubprocess, self).__init__(cmd, params=params, io_loop=io_loop)
-        if not 'node' in params:
-            raise ValueError('Parameter "node" is required')
-        self.node = params['node']
+        if not 'node' in params and not 'node_backend' in params:
+            raise ValueError('Parameter "node" or "node_backend" is required')
+        self.node = params.get('node')
+        self.node_backend = params.get('node_backend')
 
     def watch(self):
         return ProgressWatcher(self.process)
@@ -25,7 +26,10 @@ class UbicSubprocess(BaseSubprocess):
 
     def status(self):
         res = super(UbicSubprocess, self).status()
-        res['node'] = self.node
+        if self.node:
+            res['node'] = self.node
+        if self.node_backend:
+            res['node_backend'] = self.node_backend
         return res
 
     def create_group_file_marker(self):

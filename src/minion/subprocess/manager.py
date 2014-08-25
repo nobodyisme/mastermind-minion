@@ -21,13 +21,16 @@ class SubprocessManager(object):
     def get_subprocess(self, cmd, params):
         if cmd[0] == 'rsync':
             Subprocess = RsyncSubprocess
-            self.check(params.get('group', 0))
+            self.check_group(params.get('group', 0))
         elif cmd[0] == 'dnet_ioclient':
             Subprocess = DnetIoclientSubprocess
+            self.check_node(params.get('node'), params.get('node_backend'))
         elif cmd[0] == 'dnet_client':
             Subprocess = DnetClientSubprocess
+            self.check_node(params.get('node'), params.get('node_backend'))
         elif cmd[0] == 'ubic':
             Subprocess = UbicSubprocess
+            self.check_node(params.get('node'), params.get('node_backend'))
         else:
             raise ValueError('Unsupported command: {0}'.format(cmd[0]))
         return Subprocess
@@ -56,7 +59,7 @@ class SubprocessManager(object):
     def keys(self):
         return self.subprocesses.keys()
 
-    def check(self, group):
+    def check_group(self, group):
         for subprocess in self.subprocesses.itervalues():
             if not isinstance(subprocess, RsyncSubprocess):
                 continue
@@ -64,6 +67,16 @@ class SubprocessManager(object):
             if status['group'] == group and status['progress'] < 1.0:
                 raise ValueError('Task for group {0} is already running, '
                     'pid: {1}'.format(group, status['pid']))
+
+    def check_node(self, node, node_backend):
+        for subprocess in self.subprocesses.itervalues():
+            status = subprocess.status()
+            if node and status.get('node') == node:
+                raise ValueError('Task for node {0} is already running, '
+                    'pid: {1}'.format(node, status['pid']))
+            elif node_backend and status.get('node_backend') == node_backend:
+                raise ValueError('Task for node backend {0} is already running, '
+                    'pid: {1}'.format(node_backend, status['pid']))
 
 
 manager = SubprocessManager()
