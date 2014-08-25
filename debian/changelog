@@ -1,3 +1,10 @@
+mastermind-minion (0.16) unstable; urgency=low
+
+  * Extended checking of node backends list of executing tasks to prevent simultaneous execution
+    of tasks for the same backend
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 25 Aug 2014 15:02:39 +0400
+
 mastermind-minion (0.15) unstable; urgency=low
 
   * Fix for dnet client command
