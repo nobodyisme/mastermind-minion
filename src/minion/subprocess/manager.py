@@ -71,10 +71,10 @@ class SubprocessManager(object):
     def check_node(self, node, node_backend):
         for subprocess in self.subprocesses.itervalues():
             status = subprocess.status()
-            if node and status.get('node') == node:
+            if node and status.get('node') == node and status['progress'] < 1.0:
                 raise ValueError('Task for node {0} is already running, '
                     'pid: {1}'.format(node, status['pid']))
-            elif node_backend and status.get('node_backend') == node_backend:
+            elif node_backend and status.get('node_backend') == node_backend and status['progress'] < 1.0:
                 raise ValueError('Task for node backend {0} is already running, '
                     'pid: {1}'.format(node_backend, status['pid']))
 
