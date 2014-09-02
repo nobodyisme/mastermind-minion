@@ -10,6 +10,7 @@ from minion.logger import logger
 from minion.subprocess.rsync import RsyncSubprocess
 from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
 from minion.subprocess.dnet_client import DnetClientSubprocess
+from minion.subprocess.dnet_recovery import DnetRecoverySubprocess
 from minion.subprocess.ubic import UbicSubprocess
 
 
@@ -27,6 +28,9 @@ class SubprocessManager(object):
             self.check_node(params.get('node'), params.get('node_backend'))
         elif cmd[0] == 'dnet_client':
             Subprocess = DnetClientSubprocess
+            self.check_node(params.get('node'), params.get('node_backend'))
+        elif cmd[0] == 'dnet_recovery':
+            Subprocess = DnetRecoverySubprocess
             self.check_node(params.get('node'), params.get('node_backend'))
         elif cmd[0] == 'ubic':
             Subprocess = UbicSubprocess
