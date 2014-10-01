@@ -1,5 +1,6 @@
 import os
 import os.path
+import shutil
 
 from tornado.ioloop import IOLoop
 
@@ -52,4 +53,17 @@ class RsyncSubprocess(BaseSubprocess):
                             'for group {0}'.format(group))
         else:
             logger.info('Group file creation was not requested for '
+                'group {0}'.format(self.params.get('group')))
+
+        if self.params.get('remove_path'):
+            try:
+                shutil.rmtree(self.params['remove_path'])
+            except Exception as e:
+                logger.exception('Failed to remove path {0}: {1}'.format(
+                    self.params['remove_path'], e))
+            else:
+                logger.info('Successfully removed path {0} '
+                    'for group {1}'.format(self.params['remove_path'], group))
+        else:
+            logger.info('Path removal was not requested for '
                 'group {0}'.format(self.params.get('group')))
