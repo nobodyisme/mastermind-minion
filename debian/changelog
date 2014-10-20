@@ -1,3 +1,9 @@
+mastermind-minion (0.21) unstable; urgency=low
+
+  * Gzip compression on
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 20 Oct 2014 15:14:39 +0400
+
 mastermind-minion (0.20) unstable; urgency=low
 
   * Additional option for path removal on successful rsync
