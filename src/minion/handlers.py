@@ -77,7 +77,7 @@ class CommandTerminateHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def post(self):
-        cmd = self.get_argument('cmd_uid')
+        uid = self.get_argument('cmd_uid')
         manager.terminate(uid)
         return {uid: manager.status(uid)}
 
