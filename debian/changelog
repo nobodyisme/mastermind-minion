@@ -1,3 +1,9 @@
+mastermind-minion (0.23) unstable; urgency=low
+
+  * Misprint fixed
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Tue, 23 Dec 2014 19:57:07 +0300
+
 mastermind-minion (0.22) unstable; urgency=low
 
   * Drafts for commands termination
