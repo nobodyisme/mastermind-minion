@@ -11,7 +11,7 @@ class ProgressWatcher(object):
                                            streaming_callback=self.feed)
         subprocess.stderr.read_until_close(self.feed_error,
                                            streaming_callback=self.feed_error)
-        subprocess.set_exit_callback(self.exit)
+        subprocess.set_exit_callback(self.exit_cb)
         self.subprocess = subprocess
 
         self.success_cb = None
@@ -28,7 +28,7 @@ class ProgressWatcher(object):
     def feed_error(self, s):
         self.error_output.append(s)
 
-    def exit(self, code):
+    def exit_cb(self, code):
         self.exit = True
         self.exit_code = code
         self.progress = 1.0

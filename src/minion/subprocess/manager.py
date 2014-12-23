@@ -63,6 +63,12 @@ class SubprocessManager(object):
     def keys(self):
         return self.subprocesses.keys()
 
+    def terminate(self, uid):
+        if not uid in self.subprocesses:
+            raise ValueError('Unknown command uid: {0}'.format(uid))
+
+        self.subprocesses[uid].terminate()
+
     def check_group(self, group):
         for subprocess in self.subprocesses.itervalues():
             if not isinstance(subprocess, RsyncSubprocess):

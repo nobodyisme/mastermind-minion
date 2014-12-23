@@ -72,6 +72,16 @@ class RsyncManualHandler(tornado.web.RequestHandler):
         self.write(loader.load('manual.html').generate())
 
 
+@h.route(app, r'/command/terminate/', name='terminate')
+class CommandTerminateHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
+    @api_response
+    def post(self):
+        cmd = self.get_argument('cmd_uid')
+        manager.terminate(uid)
+        return {uid: manager.status(uid)}
+
+
 @h.route(app, r'/rsync/status/([0-9a-f]+)/', name='status')
 class RsyncStatusHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
@@ -87,10 +97,8 @@ class NodeShutdownHandler(AuthenticationRequestHandler):
     def post(self):
         cmd = self.get_argument('command')
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
-        print params
         uid = manager.run(cmd, params)
         self.set_status(302)
-        print uid, self.reverse_url('status', uid)
         self.add_header('Location', self.reverse_url('status', uid))
 
 

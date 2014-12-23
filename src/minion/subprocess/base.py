@@ -43,3 +43,7 @@ class BaseSubprocess(object):
         })
 
         return res
+
+    def terminate(self):
+        if self.process.returncode is None:
+            self.process.terminate()
