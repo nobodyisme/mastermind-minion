@@ -1,5 +1,6 @@
 import copy
 import os
+import signal
 
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
@@ -46,4 +47,9 @@ class BaseSubprocess(object):
 
     def terminate(self):
         if self.process.returncode is None:
-            self.process.terminate()
+            try:
+                os.kill(self.process.pid, signal.SIGTERM)
+            except OSError as e:
+                if e.errno == 3:
+                    # 3 == No such process
+                    pass
