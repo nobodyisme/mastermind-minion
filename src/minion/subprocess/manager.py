@@ -66,8 +66,14 @@ class SubprocessManager(object):
     def terminate(self, uid):
         if not uid in self.subprocesses:
             raise ValueError('Unknown command uid: {0}'.format(uid))
+        logger.info('terminating command {0}, pid: {1}'.format(uid,
+            self.subprocesses[uid].process.pid))
 
-        self.subprocesses[uid].terminate()
+        # result, error, sub = self.subprocesses[uid].terminate().result()
+        code = self.subprocesses[uid].terminate()
+        if code:
+            raise RuntimeError('Failed to terminate command {0}, '
+                'exit code: {1}'.format(uid, code))
 
     def check_group(self, group):
         for subprocess in self.subprocesses.itervalues():

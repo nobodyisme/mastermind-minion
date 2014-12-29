@@ -1,9 +1,11 @@
 import copy
 import os
+import shlex
 import signal
 
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
+from tornado.gen import Task, Return, coroutine
 
 
 class BaseSubprocess(object):
@@ -47,9 +49,20 @@ class BaseSubprocess(object):
 
     def terminate(self):
         if self.process.returncode is None:
-            try:
-                os.kill(self.process.pid, signal.SIGTERM)
-            except OSError as e:
-                if e.errno == 3:
-                    # 3 == No such process
-                    pass
+            self.__children_pids(self.__terminate_pid_tree)
+
+    def __children_pids(self, callback):
+        cmd_str = 'pgrep -P {pid}'.format(pid=self.process.pid)
+        sub = Subprocess(shlex.split(cmd_str),
+                         stdout=Subprocess.STREAM,
+                         stderr=Subprocess.STREAM,
+                         io_loop=self.io_loop)
+        sub.stdout.read_until_close(callback=callback)
+
+    def __terminate_pid_tree(self, pids):
+        tree_pids = pids.strip() + ' ' + str(self.process.pid)
+        cmd_str = 'kill ' + tree_pids
+        sub = Subprocess(shlex.split(cmd_str),
+                         stdout=Subprocess.STREAM,
+                         stderr=Subprocess.STREAM,
+                         io_loop=self.io_loop)
