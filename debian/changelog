@@ -1,3 +1,9 @@
+mastermind-minion (0.25) unstable; urgency=low
+
+  * Process termination fixed
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 29 Dec 2014 18:15:38 +0300
+
 mastermind-minion (0.24) unstable; urgency=low
 
   * Termination of subprocess via os module API
