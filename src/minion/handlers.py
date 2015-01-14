@@ -54,7 +54,8 @@ def api_response(method):
     return wrapped
 
 
-@h.route(app, r'/rsync/start/', name='start')
+@h.route(app, r'/command/start/', name='start')
+@h.route(app, r'/rsync/start/')
 class RsyncStartHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
@@ -82,7 +83,8 @@ class CommandTerminateHandler(AuthenticationRequestHandler):
         return {uid: manager.status(uid)}
 
 
-@h.route(app, r'/rsync/status/([0-9a-f]+)/', name='status')
+@h.route(app, r'/command/status/([0-9a-f]+)/', name='status')
+@h.route(app, r'/rsync/status/([0-9a-f]+)/')
 class RsyncStatusHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
@@ -102,13 +104,19 @@ class NodeShutdownHandler(AuthenticationRequestHandler):
         self.add_header('Location', self.reverse_url('status', uid))
 
 
+@h.route(app, r'/command/list/')
 @h.route(app, r'/rsync/list/')
 class RsyncListHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def get(self):
         self.add_header('Content-Type', 'text/json')
+        finish_ts_gte = int(self.get_argument('finish_ts_gte', default=0)) or None
         res = {}
         for uid in manager.keys():
+            cmd_status = manager.status(uid)
+            if (finish_ts_gte and cmd_status['finish_ts'] and
+                cmd_status['finish_ts'] < finish_ts_gte):
+                continue
             res[uid] = manager.status(uid)
         return res
