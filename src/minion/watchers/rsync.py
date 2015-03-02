@@ -50,7 +50,9 @@ class RsyncWatcher(ProgressWatcher):
 
     @property
     def exit_messages(self):
-        return RSYNC_EXIT_CODES
+        messages = super(RsyncWatcher, self).exit_messages
+        messages.update(RSYNC_EXIT_CODES)
+        return messages
 
 
 RSYNC_EXIT_CODES = {
