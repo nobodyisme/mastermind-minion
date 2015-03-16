@@ -38,7 +38,8 @@ class RsyncWatcher(ProgressWatcher):
 
         percentage = int(parts[1][:-1])
 
-        self.progress = (percentage / 100.0 / self.total_files + self.current_file / self.total_files)
+        self.progress = min((percentage / 100.0 / self.total_files + self.current_file / self.total_files),
+                            0.9999)
 
         cnt_match = self.FILES_CNT_RE.findall(parts[-1])
         if cnt_match:
