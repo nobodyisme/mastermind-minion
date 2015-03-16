@@ -5,7 +5,6 @@ import signal
 
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
-from tornado.gen import Task, Return, coroutine
 
 
 class BaseSubprocess(object):
@@ -43,6 +42,7 @@ class BaseSubprocess(object):
         res.update({
             'pid': self.process.pid,
             'command': self.cmd_str,
+            'task_id': self.params.get('task_id'),
         })
 
         return res

@@ -48,6 +48,14 @@ class SubprocessManager(object):
                if isinstance(command, basestring) else
                command)
 
+        if params.get('task_id'):
+            running_uid = self.try_find_running_subprocess(params['task_id'])
+            if running_uid:
+                running_sub = self.subprocesses[running_uid]
+                logger.info('command execution is not required, '
+                    'process for task {0} is already running: {1}'.format(
+                        params['task_id'], running_sub.status()))
+                return running_uid
         Subprocess = self.get_subprocess(cmd, params)
         sub = Subprocess(cmd, params=params)
         sub.run()
@@ -93,6 +101,12 @@ class SubprocessManager(object):
             elif node_backend and status.get('node_backend') == node_backend and status['progress'] < 1.0:
                 raise ValueError('Task for node backend {0} is already running, '
                     'pid: {1}'.format(node_backend, status['pid']))
+
+    def try_find_running_subprocess(self, task_id):
+        for uid, subprocess in self.subprocesses.iteritems():
+            status = subprocess.status()
+            if status.get('task_id') and status['task_id'] == task_id:
+                return uid
 
 
 manager = SubprocessManager()
