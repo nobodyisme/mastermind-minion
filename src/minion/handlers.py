@@ -40,17 +40,29 @@ class AuthenticationRequestHandler(tornado.web.RequestHandler):
 def api_response(method):
     @wraps(method)
     def wrapped(self, *args, **kwargs):
-        self.add_header('Content-Type', 'text/json')
         try:
-            res = method(self, *args, **kwargs)
-        except Exception as e:
-            logger.error('{0}: {1}'.format(e, traceback.format_exc(e)))
-            response = {'status': 'error',
-                        'error': str(e)}
-        else:
-            response = {'status': 'success',
-                        'response': res}
-        self.write(json.dumps(response))
+            self.add_header('Content-Type', 'text/json')
+            try:
+                res = method(self, *args, **kwargs)
+            except Exception as e:
+                logger.error('{0}: {1}'.format(e, traceback.format_exc(e)))
+                response = {'status': 'error',
+                            'error': str(e)}
+            else:
+                response = {'status': 'success',
+                            'response': res}
+            try:
+                self.write(json.dumps(response))
+            except Exception as e:
+                logger.error('Failed to dump json response: {0}\n{1}'.format(e,
+                    traceback.format_exc(e)))
+                response = {'status': 'error',
+                            'error': 'failed to construct response, see log file'}
+                self.write(json.dumps(response))
+
+        finally:
+            self.finish()
+
     return wrapped
 
 
