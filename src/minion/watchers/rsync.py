@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import re
 
 from minion.watchers.base import ProgressWatcher
@@ -9,8 +8,8 @@ class RsyncWatcher(ProgressWatcher):
     SPLIT_RE = re.compile(r'\r|\n')
     FILES_CNT_RE = re.compile(r'(\d+)/(\d+)')
 
-    def __init__(self, subprocess):
-        super(RsyncWatcher, self).__init__(subprocess)
+    def __init__(self, subprocess, success_codes=None):
+        super(RsyncWatcher, self).__init__(subprocess, success_codes=success_codes)
         self.current_file = 0
         self.total_files = 20  # first estimation of total files num
 
