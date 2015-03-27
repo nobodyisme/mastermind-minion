@@ -72,3 +72,23 @@ class UbicSubprocess(BaseSubprocess):
             else:
                 logger.info('Successfully performed move task: {0} to {1}'.format(
                     self.params['move_src'], self.params['move_dst']))
+
+        if self.params.get('mark_backend'):
+            marker = self.params['mark_backend']
+            try:
+                open(marker, 'w').close()
+            except Exception as e:
+                logger.error('Failed to create backend down marker: {0}'.format(e))
+            else:
+                logger.info('Successfully created backend down marker: {0}'.format(
+                    self.params['mark_backend']))
+
+        if self.params.get('unmark_backend'):
+            marker = self.params['unmark_backend']
+            try:
+                os.remove(self.params['unmark_backend'])
+            except Exception as e:
+                logger.error('Failed to remove backend down marker: {0}'.format(e))
+            else:
+                logger.info('Successfully removed backend down marker: {0}'.format(
+                    self.params['unmark_backend']))
