@@ -6,16 +6,19 @@ import signal
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 
+from minion.watchers.base import ProgressWatcher
+
 
 class BaseSubprocess(object):
 
-    def __init__(self, cmd, params=None, io_loop=IOLoop.instance()):
+    def __init__(self, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
         self.cmd = cmd
         self.cmd_str = ' '.join(self.cmd)
         self.env = copy.copy(os.environ)
         self.process = None
         self.watcher = None
         self.params = params
+        self.success_codes = success_codes
         self.io_loop = io_loop
 
     def run(self):
@@ -27,7 +30,11 @@ class BaseSubprocess(object):
         self.watcher = self.watch()
 
     def watch(self):
-        raise NotImplemented('Use dedicated subprocess objects')
+        return self.watcher_base(self.process, success_codes=self.success_codes)
+
+    @property
+    def watcher_base(self):
+        return ProgressWatcher
 
     @property
     def pid(self):

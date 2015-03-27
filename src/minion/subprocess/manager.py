@@ -39,7 +39,7 @@ class SubprocessManager(object):
             raise ValueError('Unsupported command: {0}'.format(cmd[0]))
         return Subprocess
 
-    def run(self, command, params):
+    def run(self, command, params, success_codes=None):
         logger.info('command to execute: {0}'.format(command))
         logger.info('parameters supplied: {0}'.format(params))
         if isinstance(command, unicode):
@@ -57,7 +57,7 @@ class SubprocessManager(object):
                         params['task_id'], running_sub.status()))
                 return running_uid
         Subprocess = self.get_subprocess(cmd, params)
-        sub = Subprocess(cmd, params=params)
+        sub = Subprocess(cmd, params=params, success_codes=success_codes)
         sub.run()
 
         logger.info('command execution started successfully, pid: {0}'.format(sub.pid))

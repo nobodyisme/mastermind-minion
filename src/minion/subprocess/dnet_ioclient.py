@@ -6,15 +6,12 @@ from minion.watchers.base import ProgressWatcher
 
 class DnetIoclientSubprocess(BaseSubprocess):
 
-    def __init__(self, cmd, params=None, io_loop=IOLoop.instance()):
-        super(DnetIoclientSubprocess, self).__init__(cmd, params=params, io_loop=io_loop)
+    def __init__(self, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+        super(DnetIoclientSubprocess, self).__init__(cmd, params=params, success_codes=success_codes, io_loop=io_loop)
         if not 'node' in params and not 'node_backend' in params:
             raise ValueError('Parameter "node" or "node_backend" is required')
         self.node = params.get('node')
         self.node_backend = params.get('node_backend')
-
-    def watch(self):
-        return ProgressWatcher(self.process)
 
     def status(self):
         res = super(DnetIoclientSubprocess, self).status()

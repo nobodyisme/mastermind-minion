@@ -1,12 +1,15 @@
 import datetime
 import time
 
+from minion.logger import logger
+
 
 class ProgressWatcher(object):
-    def __init__(self, subprocess):
+    def __init__(self, subprocess, success_codes=None):
         self.progress = 0.0
         self.start_ts = int(time.time())
         self.finish_ts = None
+        self.success_codes = success_codes
 
         subprocess.stdout.read_until_close(self.feed,
                                            streaming_callback=self.feed)
@@ -34,28 +37,46 @@ class ProgressWatcher(object):
         self.error_output.append(s)
 
     def exit_cb(self, code):
+        logger.info('pid {0}: exit callback'.format(self.subprocess.pid))
         self.exit = True
         if self.exit_cb_timeout:
+            logger.info('pid {0}: removing false exit callback'.format(
+                self.subprocess.pid))
             self.subprocess.io_loop.remove_timeout(self.exit_cb_timeout)
             self.exit_cb_timeout = None
         self.exit_code = code
         self.progress = 1.0
         self.finish_ts = int(time.time())
 
-        if self.success_cb and self.exit_code == 0:
+        if self.success_cb and self.is_success():
+            logger.info('pid {0}: executing success callback'.format(
+                self.subprocess.pid))
             self.success_cb()
+
+    def is_success(self):
+        success = (self.exit_code == 0 or
+                   (self.success_codes and self.exit_code in self.success_codes or False)
+                  )
+        logger.info('pid {0}: exit code {1}, considered success: {2}'.format(
+            self.subprocess.pid, self.exit_code, success))
 
     def ensure_exit_cb(self):
 
         def set_false_exit_code():
+            logger.warn('pid {0}: executing false exit callback'.format(
+                self.subprocess.pid))
             self.exit_cb_timeout = None
             if self.exit:
                 return
+            logger.warn('pid {0}: setting exit code to 999'.format(
+                self.subprocess.pid))
             self.exit = True
             self.exit_code = 999
             self.progress = 1.0
             self.finish_ts = int(time.time())
 
+        logger.info('pid {0}: setting false exit callback'.format(
+            self.subprocess.pid))
         self.exit_cb_timeout = self.subprocess.io_loop.add_timeout(
             datetime.timedelta(seconds=10), set_false_exit_code)
 
