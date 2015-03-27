@@ -1,3 +1,9 @@
+mastermind-minion (0.31) unstable; urgency=low
+
+  * Additional success codes for subprocesses: useful when subprocess execution should be considered successful even if exit code is not zero
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 27 Mar 2015 16:30:45 +0300
+
 mastermind-minion (0.30) unstable; urgency=low
 
   * Explicitly finish tornado response, additional logging when failed to construct response
