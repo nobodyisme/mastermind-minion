@@ -9,7 +9,7 @@ class ProgressWatcher(object):
         self.progress = 0.0
         self.start_ts = int(time.time())
         self.finish_ts = None
-        self.success_codes = success_codes
+        self.success_codes = success_codes or []
 
         subprocess.stdout.read_until_close(self.feed,
                                            streaming_callback=self.feed)
@@ -26,6 +26,7 @@ class ProgressWatcher(object):
 
         self.exit = False
         self.exit_code = None
+        self.command_code = None
 
         self.output = []
         self.error_output = []
@@ -47,11 +48,15 @@ class ProgressWatcher(object):
         self.exit_code = code
         self.progress = 1.0
         self.finish_ts = int(time.time())
+        self.set_command_code()
 
-        if self.success_cb and self.is_success():
-            logger.info('pid {0}: executing success callback'.format(
-                self.subprocess.pid))
-            self.success_cb()
+        logger.info('pid {0}: exit code {1}, command code {2}'.format(
+            self.subprocess.pid, self.exit_code, self.command_code))
+        if self.success_cb:
+            if self.exit_code == 0 or self.command_code in self.success_codes:
+                logger.info('pid {0}: executing success callback'.format(
+                    self.subprocess.pid))
+                self.success_cb()
 
     def is_success(self):
         success = (self.exit_code == 0 or
@@ -60,6 +65,9 @@ class ProgressWatcher(object):
         logger.info('pid {0}: exit code {1}, considered success: {2}'.format(
             self.subprocess.pid, self.exit_code, success))
         return success
+
+    def set_command_code(self):
+        self.command_code = self.exit_code
 
     def ensure_exit_cb(self):
 
@@ -99,6 +107,7 @@ class ProgressWatcher(object):
             'progress': self.progress,
             'exit_code': self.exit_code,
             'exit_message': self.exit_message,
+            'command_code': self.command_code,
             'start_ts': self.start_ts,
             'finish_ts': self.finish_ts,
             'output': ''.join(self.output),
