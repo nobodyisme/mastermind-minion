@@ -59,6 +59,7 @@ class ProgressWatcher(object):
                   )
         logger.info('pid {0}: exit code {1}, considered success: {2}'.format(
             self.subprocess.pid, self.exit_code, success))
+        return success
 
     def ensure_exit_cb(self):
 
