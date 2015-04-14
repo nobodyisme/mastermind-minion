@@ -58,14 +58,6 @@ class ProgressWatcher(object):
                     self.subprocess.pid))
                 self.success_cb()
 
-    def is_success(self):
-        success = (self.exit_code == 0 or
-                   (self.success_codes and self.exit_code in self.success_codes or False)
-                  )
-        logger.info('pid {0}: exit code {1}, considered success: {2}'.format(
-            self.subprocess.pid, self.exit_code, success))
-        return success
-
     def set_command_code(self):
         self.command_code = self.exit_code
 
@@ -84,6 +76,8 @@ class ProgressWatcher(object):
             self.progress = 1.0
             self.finish_ts = int(time.time())
 
+        if self.exit:
+            return
         logger.info('pid {0}: setting false exit callback'.format(
             self.subprocess.pid))
         self.exit_cb_timeout = self.subprocess.io_loop.add_timeout(
