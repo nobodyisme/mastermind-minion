@@ -11,6 +11,8 @@ case "$1" in
 
     mkdir -p /var/run/mastermind-minion
 
+    /usr/local/bin/mastermind-minion/update_db.sh
+
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
     ;;

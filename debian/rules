@@ -13,6 +13,10 @@ install/mastermind-minion::
 	mkdir -p debian/tmp/etc/elliptics/mastermind-minion
 	cp etc/mastermind-minion-default.conf debian/tmp/etc/elliptics/mastermind-minion/mastermind-minion-default.conf
 	cp etc/logging-default.conf debian/tmp/etc/elliptics/mastermind-minion/logging-default.conf
+	mkdir -p debian/tmp/usr/local/bin/mastermind-minion
+	cp sql/update_db.sh debian/tmp/usr/local/bin/mastermind-minion
+	mkdir -p debian/tmp/var/lib/mastermind-minion/patches
+	cp sql/patches/* debian/tmp/var/lib/mastermind-minion/patches
 
 install/mastermind-minion-utils::
 	mkdir -p debian/tmp/usr/bin

@@ -1,2 +1,4 @@
 etc/elliptics/mastermind-minion
 usr/lib
+var/lib/mastermind-minion
+usr/local/bin/mastermind-minion
