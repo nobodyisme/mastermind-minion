@@ -5,13 +5,12 @@ from tornado.ioloop import IOLoop
 
 from minion.logger import logger
 from minion.subprocess.base import BaseSubprocess
-from minion.watchers.base import ProgressWatcher
 
 
 class UbicSubprocess(BaseSubprocess):
 
-    def __init__(self, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
-        super(UbicSubprocess, self).__init__(cmd, params=params, success_codes=success_codes, io_loop=io_loop)
+    def __init__(self, uid, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+        super(UbicSubprocess, self).__init__(uid, cmd, params=params, success_codes=success_codes, io_loop=io_loop)
         if not 'node' in params and not 'node_backend' in params:
             raise ValueError('Parameter "node" or "node_backend" is required')
         self.node = params.get('node')

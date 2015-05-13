@@ -2,16 +2,20 @@ import copy
 import os
 import shlex
 import signal
+import time
 
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 
+from minion.db import Session
+import minion.db.commands
 from minion.watchers.base import ProgressWatcher
 
 
 class BaseSubprocess(object):
 
-    def __init__(self, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+    def __init__(self, uid, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+        self.uid = uid
         self.cmd = cmd
         self.cmd_str = ' '.join(self.cmd)
         self.env = copy.copy(os.environ)
@@ -27,14 +31,27 @@ class BaseSubprocess(object):
                                   stderr=Subprocess.STREAM,
                                   env=self.env,
                                   io_loop=self.io_loop)
-        self.watcher = self.watch()
 
-    def watch(self):
-        return self.watcher_base(self.process, success_codes=self.success_codes)
+        # create db record
+        s = Session()
+        s.begin()
+        command = minion.db.commands.Command(uid=self.uid,
+                          pid=self.process.pid,
+                          command=self.cmd_str,
+                          start_ts=int(time.time()),
+                          task_id=self.params.get('task_id'))
+        #TODO:
+        #what about group_id, node, node_backend ?
 
-    @property
-    def watcher_base(self):
-        return ProgressWatcher
+        s.add(command)
+        s.commit()
+
+        self.watcher = self.watch(command)
+
+    def watch(self, command):
+        return self.watcher_base(self.process, command, success_codes=self.success_codes)
+
+    watcher_base = ProgressWatcher
 
     @property
     def pid(self):

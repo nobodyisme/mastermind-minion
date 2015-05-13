@@ -4,9 +4,11 @@ import traceback
 from opster import command
 import tornado.ioloop
 
-from minion import app
+from minion.app import app
 from minion.config import config
+import minion.db.commands  # prevents dependency cycle with manager
 from minion import daemon
+from minion.subprocess.manager import manager
 from minion import handlers
 from minion.logger import logger
 
@@ -33,6 +35,8 @@ def main(daemonize=('', False, 'Daemonize this process'),
 
 def run():
     logger.info('Starting event loop...')
+    app.listen(int(config['common']['port']))
+    manager.update_broken_commands()
     tornado.ioloop.IOLoop.instance().start()
 
 

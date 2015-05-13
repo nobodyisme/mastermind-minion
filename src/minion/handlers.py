@@ -124,13 +124,5 @@ class RsyncListHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def get(self):
-        self.add_header('Content-Type', 'text/json')
         finish_ts_gte = int(self.get_argument('finish_ts_gte', default=0)) or None
-        res = {}
-        for uid in manager.keys():
-            cmd_status = manager.status(uid)
-            if (finish_ts_gte and cmd_status['finish_ts'] and
-                cmd_status['finish_ts'] < finish_ts_gte):
-                continue
-            res[uid] = manager.status(uid)
-        return res
+        return manager.unfinished_commands(finish_ts_gte=finish_ts_gte)
