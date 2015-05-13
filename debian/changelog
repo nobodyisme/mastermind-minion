@@ -1,3 +1,9 @@
+mastermind-minion (0.36) unstable; urgency=low
+
+  * Sqlite as a backup commands storage implemented
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 13 May 2015 12:56:44 +0300
+
 mastermind-minion (0.35) unstable; urgency=low
 
   * Minion returns command code along with process exit code
