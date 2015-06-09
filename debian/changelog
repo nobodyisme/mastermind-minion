@@ -1,3 +1,9 @@
+mastermind-minion (0.40) unstable; urgency=low
+
+  * Creating ids file on demand
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Tue, 09 Jun 2015 18:28:48 +0300
+
 mastermind-minion (0.39) unstable; urgency=low
 
   * Command encoding fix
