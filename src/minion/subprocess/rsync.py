@@ -66,3 +66,19 @@ class RsyncSubprocess(BaseSubprocess):
         else:
             logger.info('Path removal was not requested for '
                 'group {0}'.format(self.params.get('group')))
+
+        if self.params.get('ids'):
+            ids_file = self.params['ids']
+            logger.info('Generating ids file {} required'.format(ids_file))
+            if os.path.exists(ids_file):
+                logger.info('Ids file {} already exists'.format(ids_file))
+            else:
+                try:
+                    with open(ids_file, 'wb') as f:
+                        f.write(os.urandom(64))
+                except Exception as e:
+                    logger.exception('Failed to create ids file {}'.format(
+                        ids_file))
+                else:
+                    logger.info('Successfully created ids file {} '
+                        'for group {1}'.format(ids_file, group))
