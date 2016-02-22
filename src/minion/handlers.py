@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+import os.path
 import traceback
 
 import tornado.web
@@ -10,7 +11,7 @@ import minion.helpers as h
 from minion.logger import logger
 from minion.subprocess.manager import manager
 from minion.templates import loader
-from minion.watchers import RsyncWatcher
+from minion.subprocess.executor import GroupCreator, GroupRemover
 
 
 @h.route(app, r'/ping/')
@@ -126,3 +127,75 @@ class RsyncListHandler(AuthenticationRequestHandler):
     def get(self):
         finish_ts_gte = int(self.get_argument('finish_ts_gte', default=0)) or None
         return manager.unfinished_commands(finish_ts_gte=finish_ts_gte)
+
+
+@h.route(app, r'/command/create_group/')
+class CreateGroupHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
+    @api_response
+    def post(self):
+        if config['common'].get('base_path') is None:
+            logger.error('base path is not set, create group cannot be performed')
+            self.set_status(500)
+            raise RuntimeError('group creation is not allowed')
+        files = {}
+        for filename, http_files in self.request.files.iteritems():
+            norm_filename = os.path.normpath(filename)
+            if norm_filename.startswith('..') or norm_filename.startswith('/'):
+                logger.error(
+                    'Cannot create file {filename}, '
+                    'normalized path {norm_filename} is not allowed'.format(
+                        filename=filename,
+                        norm_filename=norm_filename,
+                    )
+                )
+                self.set_status(403)
+                raise RuntimeError(
+                    'File {filename} is forbidden, path should be relative '
+                    'to group base directory'.format(filename=filename)
+                )
+            http_file = http_files[0]
+            files[norm_filename] = http_file.body
+
+        params = {
+            k: v[0]
+            for k, v in self.request.arguments.iteritems()
+        }
+        params['group_base_path'] = os.path.normpath(params['group_base_path'])
+        if not params['group_base_path'].startswith(config['common']['base_path']):
+            self.set_status(403)
+            raise RuntimeError(
+                'Group base path {path} is not under common base path'.format(
+                    path=params['group_base_path'],
+                )
+            )
+        params['files'] = files
+        uid = manager.execute(GroupCreator, cmd='create_group', params=params)
+        self.set_status(302)
+        self.add_header('Location', self.reverse_url('status', uid))
+
+
+@h.route(app, r'/command/remove_group/')
+class RemoveGroupHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
+    @api_response
+    def post(self):
+        if config['common'].get('base_path') is None:
+            logger.error('base path is not set, remove group cannot be performed')
+            self.set_status(500)
+            raise RuntimeError('group creation is not allowed')
+        params = {
+            k: v[0]
+            for k, v in self.request.arguments.iteritems()
+        }
+        params['group_path'] = os.path.normpath(params['group_path'])
+        if not params['group_path'].startswith(config['common']['base_path']):
+            self.set_status(403)
+            raise RuntimeError(
+                'Group path {path} is not under common base path'.format(
+                    path=params['group_path'],
+                )
+            )
+        uid = manager.execute(GroupRemover, cmd='remove_group', params=params)
+        self.set_status(302)
+        self.add_header('Location', self.reverse_url('status', uid))

@@ -26,6 +26,8 @@ class SubprocessManager(object):
 
     @staticmethod
     def pid_exists(pid):
+        if not pid:
+            return False
         try:
             os.kill(pid, 0)
         except OSError:
@@ -84,6 +86,25 @@ class SubprocessManager(object):
         sub.run()
 
         logger.info('command execution started successfully, pid: {0}'.format(sub.pid))
+        self.subprocesses[uid] = sub
+        return uid
+
+    def execute(self, subprocess, cmd=None, params=None):
+        logger.info(
+            'Execute subprocess: {subprocess}, cmd={cmd}'.format(
+                subprocess=subprocess,
+                cmd=cmd,
+            )
+        )
+        cmd = (shlex.split(cmd)
+               if isinstance(cmd, basestring) else
+               cmd)
+
+        uid = uuid.uuid4().hex
+        sub = subprocess(uid, cmd or [], params=params or {})
+        sub.run()
+
+        logger.info('Subprocess executed successfully')
         self.subprocesses[uid] = sub
         return uid
 

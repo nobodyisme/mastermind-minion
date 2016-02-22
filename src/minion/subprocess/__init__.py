@@ -3,6 +3,7 @@ from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
 from minion.subprocess.dnet_client import DnetClientSubprocess
 from minion.subprocess.dnet_recovery import DnetRecoverySubprocess
 from minion.subprocess.ubic import UbicSubprocess
+from minion.subprocess.executor import GroupCreator, GroupRemover
 
 
 def subprocess_factory(cmd):
@@ -16,6 +17,10 @@ def subprocess_factory(cmd):
         Subprocess = DnetClientSubprocess
     elif cmd[0] == 'ubic':
         Subprocess = UbicSubprocess
+    elif cmd[0] == 'create_group':
+        Subprocess = GroupCreator
+    elif cmd[0] == 'remove_group':
+        Subprocess = GroupRemover
     else:
         raise ValueError('Unsupported command: {0}'.format(cmd[0]))
     return Subprocess
