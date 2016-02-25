@@ -12,6 +12,7 @@ from minion.logger import logger
 from minion.subprocess.manager import manager
 from minion.templates import loader
 from minion.subprocess.executor import GroupCreator, GroupRemover
+from minion.subprocess.dnet_client_cmd import DnetClientCmd
 
 
 @h.route(app, r'/ping/')
@@ -197,5 +198,19 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
                 )
             )
         uid = manager.execute(GroupRemover, cmd='remove_group', params=params)
+        self.set_status(302)
+        self.add_header('Location', self.reverse_url('status', uid))
+
+
+@h.route(app, r'/command/dnet_client/')
+class DnetClientCmdHandler(AuthenticationRequestHandler):
+    @AuthenticationRequestHandler.auth_required
+    @api_response
+    def post(self):
+        params = {
+            k: v[0]
+            for k, v in self.request.arguments.iteritems()
+        }
+        uid = manager.execute(DnetClientCmd, params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
