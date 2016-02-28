@@ -1,3 +1,5 @@
+import shlex
+
 from tornado.ioloop import IOLoop
 
 from minion.config import EllipticsConfig
@@ -34,7 +36,7 @@ class DnetClientCmd(BaseSubprocess):
             config = EllipticsConfig(params['config_path'])
             params['backend_id'] = config.get_group_backend(int(params['group']))
 
-        return cmd_tpl.format(**params)
+        return shlex.split(cmd_tpl.format(**params))
 
     def status(self):
         res = super(DnetClientCmd, self).status()
