@@ -37,9 +37,3 @@ class DnetClientCmd(BaseSubprocess):
             params['backend_id'] = config.get_group_backend(int(params['group']))
 
         return shlex.split(cmd_tpl.format(**params))
-
-    def status(self):
-        res = super(DnetClientCmd, self).status()
-        if self.node_backend:
-            res['node_backend'] = self.node_backend
-        return res
