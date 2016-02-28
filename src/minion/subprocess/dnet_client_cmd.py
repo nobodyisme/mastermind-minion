@@ -5,9 +5,12 @@ from tornado.ioloop import IOLoop
 from minion.config import EllipticsConfig
 from minion.logger import logger
 from minion.subprocess.base import BaseSubprocess
+from minion.watchers.dnet_client import DnetClientWatcher
 
 
 class DnetClientCmd(BaseSubprocess):
+
+    watcher_base = DnetClientWatcher
 
     def __init__(self, uid, cmd=None, params=None, success_codes=None, io_loop=IOLoop.instance()):
         cmd = self._make_command(params)
