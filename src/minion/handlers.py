@@ -162,12 +162,12 @@ class CreateGroupHandler(AuthenticationRequestHandler):
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
-        params['group_base_path'] = os.path.normpath(params['group_base_path'])
-        if not params['group_base_path'].startswith(config['common']['base_path']):
+        params['group_base_path_root_dir'] = os.path.normpath(params['group_base_path_root_dir'])
+        if not params['group_base_path_root_dir'].startswith(config['common']['base_path']):
             self.set_status(403)
             raise RuntimeError(
                 'Group base path {path} is not under common base path'.format(
-                    path=params['group_base_path'],
+                    path=params['group_base_path_root_dir'],
                 )
             )
         params['files'] = files
@@ -189,12 +189,12 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
-        params['group_path'] = os.path.normpath(params['group_path'])
-        if not params['group_path'].startswith(config['common']['base_path']):
+        params['group_base_path'] = os.path.normpath(params['group_base_path'])
+        if not params['group_base_path'].startswith(config['common']['base_path']):
             self.set_status(403)
             raise RuntimeError(
                 'Group path {path} is not under common base path'.format(
-                    path=params['group_path'],
+                    path=params['group_base_path'],
                 )
             )
         uid = manager.execute(GroupRemover, cmd='remove_group', params=params)

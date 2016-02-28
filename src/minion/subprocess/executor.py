@@ -85,13 +85,12 @@ class CodeExecutor(BaseSubprocess):
 class GroupCreator(CodeExecutor):
 
     def execute(self):
-        group_base_path = self.params['group_base_path']
-        group_base_path = group_base_path.rstrip('/')
+        group_base_path_root_dir = self.params['group_base_path_root_dir'].rstrip('/')
 
-        basename = self.get_vacant_basename(group_base_path)
+        basename = self.get_vacant_basename(group_base_path_root_dir)
         tmp_basename = self.tmp_basename(basename)
 
-        tmp_dir = os.path.join(group_base_path, tmp_basename)
+        tmp_dir = os.path.join(group_base_path_root_dir, tmp_basename)
         logger.info('Creating tmp dir for new group: {}'.format(tmp_dir))
         try:
             os.mkdir(tmp_dir, 0755)
@@ -112,7 +111,7 @@ class GroupCreator(CodeExecutor):
             with open(filename, 'wb') as f:
                 f.write(body)
 
-        dest_dir = os.path.join(group_base_path, basename)
+        dest_dir = os.path.join(group_base_path_root_dir, basename)
         logger.info(
             'Renaming tmp dir {tmp_dir} to destination dir {dest_dir}'.format(
                 tmp_dir=tmp_dir,
@@ -146,17 +145,16 @@ class GroupCreator(CodeExecutor):
 class GroupRemover(CodeExecutor):
 
     def execute(self):
-        group_path = self.params['group_path']
-        group_path = group_path.rstrip('/')
+        group_base_path = self.params['group_base_path'].rstrip('/')
 
-        if not os.path.exists(group_path):
+        if not os.path.exists(group_base_path):
             raise RuntimeError(
                 'Group dir {path} does not exist'.format(
-                    path=group_path,
+                    path=group_base_path,
                 )
             )
 
-        dst_base_path, basename = os.path.split(group_path)
+        dst_base_path, basename = os.path.split(group_base_path)
 
         remove_path = os.path.join(
             dst_base_path,
@@ -164,12 +162,12 @@ class GroupRemover(CodeExecutor):
         )
         logger.info(
             'Renaming group base dir {tmp_dir} to destination dir {dest_dir}'.format(
-                tmp_dir=group_path,
+                tmp_dir=group_base_path,
                 dest_dir=remove_path,
             )
         )
         try:
-            os.rename(group_path, remove_path)
+            os.rename(group_base_path, remove_path)
         except Exception:
             logger.exception('Failed to rename tmp dir to dest dir')
             raise
