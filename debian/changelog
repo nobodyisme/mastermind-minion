@@ -1,3 +1,9 @@
+mastermind-minion (0.48) trusty; urgency=medium
+
+  * Support dnet_client codes in dnet_client backend command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Sun, 28 Feb 2016 21:19:37 +0300
+
 mastermind-minion (0.47) trusty; urgency=medium
 
   * Fix for running dnet_client backend command
