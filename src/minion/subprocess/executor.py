@@ -168,6 +168,14 @@ class GroupRemover(CodeExecutor):
         )
         try:
             os.rename(group_base_path, remove_path)
+        except OSError as e:
+            if e.errno == 2:
+                # errno == 2: No such file or directory
+                if os.path.exists(remove_path):
+                    # group_base_path was already renamed, not an error
+                    pass
+                else:
+                    raise
         except Exception:
             logger.exception('Failed to rename tmp dir to dest dir')
             raise
