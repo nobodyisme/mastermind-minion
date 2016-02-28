@@ -1,3 +1,9 @@
+mastermind-minion (0.45) trusty; urgency=medium
+
+  * Change variable names to comply with parameter names
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Sun, 28 Feb 2016 17:29:43 +0300
+
 mastermind-minion (0.44) trusty; urgency=medium
 
   * Add handler for executing dnet_client command
