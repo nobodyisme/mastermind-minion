@@ -21,6 +21,8 @@ def subprocess_factory(cmd):
         Subprocess = GroupCreator
     elif cmd[0] == 'remove_group':
         Subprocess = GroupRemover
+    elif cmd[0] == 'lrc_convert':
+        Subprocess = UbicSubprocess
     else:
         raise ValueError('Unsupported command: {0}'.format(cmd[0]))
     return Subprocess
