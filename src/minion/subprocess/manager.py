@@ -63,9 +63,12 @@ class SubprocessManager(object):
             self.check_node(params.get('node'), params.get('node_backend'))
         return Subprocess
 
-    def run(self, command, params, success_codes=None):
+    def run(self, command, params, env=None, success_codes=None):
         logger.info('command to execute: {0}'.format(command))
-        logger.info('parameters supplied: {0}'.format(params))
+        logger.info('parameters supplied: {params}, env variables: {env}'.format(
+            params=params,
+            env=env,
+        ))
         if isinstance(command, unicode):
             command = command.encode('utf-8')
         cmd = (shlex.split(command)
@@ -82,7 +85,7 @@ class SubprocessManager(object):
                 return running_uid
         Subprocess = self.get_subprocess(cmd, params)
         uid = uuid.uuid4().hex
-        sub = Subprocess(uid, cmd, params=params, success_codes=success_codes)
+        sub = Subprocess(uid, cmd, params=params, env=env, success_codes=success_codes)
         sub.run()
 
         logger.info('command execution started successfully, pid: {0}'.format(sub.pid))

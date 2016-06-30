@@ -12,13 +12,14 @@ class DnetClientCmd(BaseSubprocess):
 
     watcher_base = DnetClientWatcher
 
-    def __init__(self, uid, cmd=None, params=None, success_codes=None, io_loop=IOLoop.instance()):
+    def __init__(self, uid, cmd=None, params=None, env=None, success_codes=None, io_loop=IOLoop.instance()):
         cmd = self._make_command(params)
         logger.info('Constructed command: {}'.format(cmd))
         super(DnetClientCmd, self).__init__(
             uid,
             cmd,
             params=params,
+            env=env,
             success_codes=success_codes,
             io_loop=io_loop
         )

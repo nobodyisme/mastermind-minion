@@ -14,11 +14,13 @@ from minion.watchers.base import ProgressWatcher
 
 class BaseSubprocess(object):
 
-    def __init__(self, uid, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+    def __init__(self, uid, cmd, params=None, env=None, success_codes=None, io_loop=IOLoop.instance()):
         self.uid = uid
         self.cmd = cmd
         self.cmd_str = ' '.join(self.cmd)
         self.env = copy.copy(os.environ)
+        if env:
+            self.env.update(env)
         self.process = None
         self.watcher = None
         self.params = params

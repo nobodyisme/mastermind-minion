@@ -78,7 +78,12 @@ class RsyncStartHandler(AuthenticationRequestHandler):
         success_codes = [int(c) for c in self.get_arguments('success_code')]
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems()
                                 if k not in ('success_code',))
-        uid = manager.run(cmd, params, success_codes=success_codes)
+        env = {}
+        for header, value in self.request.headers.iteritems():
+            if header.lower().startswith('env_'):
+                env_var_name = header.lower()[len('env_'):]
+                env[env_var_name] = value
+        uid = manager.run(cmd, params, env=env, success_codes=success_codes)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 

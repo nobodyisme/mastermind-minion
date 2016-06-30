@@ -14,8 +14,15 @@ class RsyncSubprocess(BaseSubprocess):
 
     RSYNC_PASSWORD = config['auth'].get('rsync_password', '')
 
-    def __init__(self, uid, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
-        super(RsyncSubprocess, self).__init__(uid, cmd, params=params, success_codes=success_codes, io_loop=io_loop)
+    def __init__(self, uid, cmd, params=None, env=None, success_codes=None, io_loop=IOLoop.instance()):
+        super(RsyncSubprocess, self).__init__(
+            uid,
+            cmd,
+            params=params,
+            env=env,
+            success_codes=success_codes,
+            io_loop=io_loop,
+        )
         if not 'group' in params:
             raise ValueError('Parameter "group" is required')
         self.group = params['group']

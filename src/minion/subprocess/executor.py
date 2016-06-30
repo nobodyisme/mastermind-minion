@@ -12,11 +12,12 @@ from minion.subprocess.base import BaseSubprocess
 
 class CodeExecutor(BaseSubprocess):
 
-    def __init__(self, uid, cmd, params=None, success_codes=None, io_loop=IOLoop.instance()):
+    def __init__(self, uid, cmd, params=None, env=None, success_codes=None, io_loop=IOLoop.instance()):
         super(CodeExecutor, self).__init__(
             uid,
             cmd,
             params=params,
+            env=env,
             success_codes=success_codes,
             io_loop=io_loop,
         )
