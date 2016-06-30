@@ -80,8 +80,8 @@ class RsyncStartHandler(AuthenticationRequestHandler):
                                 if k not in ('success_code',))
         env = {}
         for header, value in self.request.headers.iteritems():
-            if header.lower().startswith('env_'):
-                env_var_name = header.lower()[len('env_'):]
+            if header.upper().startswith('ENV_'):
+                env_var_name = header.upper()[len('ENV_'):]
                 env[env_var_name] = value
         uid = manager.run(cmd, params, env=env, success_codes=success_codes)
         self.set_status(302)
