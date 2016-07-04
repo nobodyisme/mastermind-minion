@@ -33,15 +33,15 @@ class BaseSubprocess(object):
         self.io_loop = io_loop
 
     def _get_config_env_vars(self, command):
-        try:
-            cfg_items = config.items('{command}_env'.format(command=command))
-        except ConfigParser.NoSectionError:
-            return {}
+        env_dict = config.get('{command}_env'.format(command=command), {})
 
         # NOTE: ConfigParser.items lowercases option names
+        # NOTE: Section's dict stores the section name itself under '__name__'
+        # key, it should be skipped
         return dict(
             (env_var_name.upper(), env_var_value)
-            for env_var_name, env_var_value in cfg_items.iteritems()
+            for env_var_name, env_var_value in env_dict.iteritems()
+            if not env_var_name.startswith('__')
         )
 
     def run(self):
