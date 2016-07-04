@@ -34,7 +34,7 @@ class BaseSubprocess(object):
 
     def _get_config_env_vars(self, command):
         try:
-            cfg_items = config.items('{command}_env', command)
+            cfg_items = config.items('{command}_env'.format(command=command))
         except ConfigParser.NoSectionError:
             return {}
 
