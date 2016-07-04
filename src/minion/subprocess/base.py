@@ -1,3 +1,4 @@
+import ConfigParser
 import copy
 import os
 import shlex
@@ -7,6 +8,7 @@ import time
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 
+from minion.config import config
 from minion.db import Session
 import minion.db.commands
 from minion.watchers.base import ProgressWatcher
@@ -19,6 +21,9 @@ class BaseSubprocess(object):
         self.cmd = cmd
         self.cmd_str = ' '.join(self.cmd)
         self.env = copy.copy(os.environ)
+        config_env = self._get_config_env_vars(cmd[0])
+        if config_env:
+            self.env.update(config_env)
         if env:
             self.env.update(env)
         self.process = None
@@ -26,6 +31,18 @@ class BaseSubprocess(object):
         self.params = params
         self.success_codes = success_codes
         self.io_loop = io_loop
+
+    def _get_config_env_vars(self, command):
+        try:
+            cfg_items = config.items('{command}_env', command)
+        except ConfigParser.NoSectionError:
+            return {}
+
+        # NOTE: ConfigParser.items lowercases option names
+        return dict(
+            (env_var_name.upper(), env_var_value)
+            for env_var_name, env_var_value in cfg_items.iteritems()
+        )
 
     def run(self):
         self.process = Subprocess(self.cmd,
