@@ -1,3 +1,9 @@
+mastermind-minion (0.55) trusty; urgency=medium
+
+  * Add configurable per-command env variables
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 04 Jul 2016 20:30:48 +0300
+
 mastermind-minion (0.54) trusty; urgency=medium
 
   * Add configurable per-command env variables
