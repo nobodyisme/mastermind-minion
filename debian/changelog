@@ -1,3 +1,9 @@
+mastermind-minion (0.58) trusty; urgency=medium
+
+  * Add finish callback for dnet recovery to parse commands stats
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Tue, 27 Sep 2016 15:00:52 +0300
+
 mastermind-minion (0.57) trusty; urgency=medium
 
   * Add support for mds_cleanup (aka langoliers)
