@@ -58,6 +58,7 @@ class BaseSubprocess(object):
                           pid=self.process.pid,
                           command=self.cmd_str,
                           start_ts=int(time.time()),
+                          update_ts=int(time.time()),
                           task_id=self.params.get('task_id'))
         #TODO:
         #what about group_id, node, node_backend ?

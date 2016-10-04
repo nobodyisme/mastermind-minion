@@ -21,15 +21,22 @@ class Command(Base):
     start_ts = Column(Integer, nullable=False)
     finish_ts = Column(Integer)
 
+    # timestamp of the last time when command was dumped to db
+    # (required to limit the rate of db dumps when stdout and stderr is updated)
+    update_ts = Column(Integer, nullable=False)
+
     task_id = Column(String)
     group_id = Column(String)
     node = Column(String)
     node_backend = Column(String)
 
+    stdout = Column(String)
+    stderr = Column(String)
+
     def status(self):
         cmd = (shlex.split(self.command.encode('utf-8'))
                if isinstance(self.command, basestring) else
-               command)
+               self.command)
         Subprocess = subprocess.subprocess_factory(cmd)
         Watcher = Subprocess.watcher_base
         return {
@@ -42,6 +49,6 @@ class Command(Base):
             'command_code': self.command_code,
             'start_ts': self.start_ts,
             'finish_ts': self.finish_ts,
-            'output': '',
-            'error_output': '',
+            'output': self.stdout,
+            'error_output': self.stderr,
         }

@@ -6,6 +6,10 @@ from minion.logger import logger
 
 
 class ProgressWatcher(object):
+
+    OUTPUT_WINDOW_SIZE = 1024 ** 2  # 1Mb
+    OUTPUT_UPDATE_PERIOD = 60
+
     def __init__(self, subprocess, command, success_codes=None):
         self.progress = 0.0
         self.start_ts = int(time.time())
@@ -32,17 +36,27 @@ class ProgressWatcher(object):
         self.exit_code = None
         self.command_code = None
 
-        self.output = []
-        self.error_output = []
+        self.output = memoryview(bytearray(' ' * self.OUTPUT_WINDOW_SIZE))
+        self.output_size = 0
+        self.error_output = memoryview(bytearray(' ' * self.OUTPUT_WINDOW_SIZE))
+        self.error_output_size = 0
 
-    def feed(self, s):
-        prev_progress = self.progress
-        self.output.append(s)
-        if abs(self.progress - prev_progress) > 0.01:
+    def _append_chunk_to_window(self, window, chunk):
+        if len(chunk) >= self.OUTPUT_WINDOW_SIZE:
+            window[:] = chunk[-self.OUTPUT_WINDOW_SIZE:]
+            return
+        chars_left = self.OUTPUT_WINDOW_SIZE - len(chunk)
+        window[:chars_left] = window[-chars_left:]
+        window[-len(chunk):] = chunk
+
+    def _update_db_dump(self):
+        if time.time() - self.command.update_ts >= self.OUTPUT_UPDATE_PERIOD:
             try:
                 s = Session()
                 s.begin()
                 self.command.progress = self.progress
+                self.command.stdout = self.get_stdout()
+                self.command.stderr = self.get_stderr()
                 s.add(self.command)
                 s.commit()
             except Exception as e:
@@ -50,8 +64,15 @@ class ProgressWatcher(object):
                     self.subprocess.pid))
                 pass
 
+    def feed(self, s):
+        self._append_chunk_to_window(self.output, s)
+        self.output_size = min(self.OUTPUT_WINDOW_SIZE, self.output_size + len(s))
+        self._update_db_dump()
+
     def feed_error(self, s):
-        self.error_output.append(s)
+        self._append_chunk_to_window(self.error_output, s)
+        self.error_output_size = min(self.OUTPUT_WINDOW_SIZE, self.error_output_size + len(s))
+        self._update_db_dump()
 
     def exit_cb(self, code):
         self.exit = True
@@ -95,6 +116,8 @@ class ProgressWatcher(object):
             command.exit_code = self.exit_code
             command.command_code = self.command_code
             command.finish_ts = self.finish_ts
+            command.stdout = self.get_stdout()
+            command.stderr = self.get_stderr()
             s.add(command)
             s.commit()
         except Exception as e:
@@ -137,6 +160,16 @@ class ProgressWatcher(object):
         999: 'Child\'s stdout was closed, but exit code was not received',
     }
 
+    def get_stdout(self):
+        if self.output_size == 0:
+            return ''
+        return self.output[-self.output_size:].tobytes()
+
+    def get_stderr(self):
+        if self.error_output_size == 0:
+            return ''
+        return self.error_output[-self.error_output_size:].tobytes()
+
     def status(self):
         return {
             'progress': self.progress,
@@ -145,8 +178,8 @@ class ProgressWatcher(object):
             'command_code': self.command_code,
             'start_ts': self.start_ts,
             'finish_ts': self.finish_ts,
-            'output': ''.join(self.output),
-            'error_output': ''.join(self.error_output)
+            'output': self.get_stdout(),
+            'error_output': self.get_stderr(),
         }
 
     def on_success(self, cb):

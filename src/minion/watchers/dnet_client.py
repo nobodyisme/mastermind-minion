@@ -10,7 +10,7 @@ class DnetClientWatcher(ProgressWatcher):
         if self.exit_code == 0:
             return self.exit_code
 
-        output = ''.join(self.output)
+        output = self.get_stdout()
         try:
             data = json.loads(output)
         except Exception as e:
