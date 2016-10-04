@@ -1,3 +1,9 @@
+mastermind-minion (0.59) trusty; urgency=medium
+
+  * Implement stdout and stderr sliding window
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Tue, 04 Oct 2016 19:15:11 +0300
+
 mastermind-minion (0.58) trusty; urgency=medium
 
   * Add finish callback for dnet recovery to parse commands stats
