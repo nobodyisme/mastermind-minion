@@ -42,6 +42,8 @@ class ProgressWatcher(object):
         self.error_output_size = 0
 
     def _append_chunk_to_window(self, window, chunk):
+        if len(chunk) == 0:
+            return
         if len(chunk) >= self.OUTPUT_WINDOW_SIZE:
             window[:] = chunk[-self.OUTPUT_WINDOW_SIZE:]
             return

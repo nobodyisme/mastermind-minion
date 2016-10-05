@@ -45,6 +45,8 @@ class CodeExecutor(BaseSubprocess):
         )
         # TODO: what about group_id, node, node_backend ?
 
+        command.update_ts = int(time.time())
+
         s.add(command)
         s.commit()
 

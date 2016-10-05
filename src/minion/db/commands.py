@@ -23,7 +23,7 @@ class Command(Base):
 
     # timestamp of the last time when command was dumped to db
     # (required to limit the rate of db dumps when stdout and stderr is updated)
-    update_ts = Column(Integer, nullable=False)
+    # update_ts = Column(Integer, nullable=False)
 
     task_id = Column(String)
     group_id = Column(String)
