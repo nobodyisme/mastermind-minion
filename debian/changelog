@@ -1,3 +1,10 @@
+mastermind-minion (0.63) trusty; urgency=medium
+
+  * Store command's update timestamp as an object runtime attribute
+  * Fix empty chunks appending to stdout/stderr
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 05 Oct 2016 19:52:20 +0300
+
 mastermind-minion (0.59) trusty; urgency=medium
 
   * Implement stdout and stderr sliding window
