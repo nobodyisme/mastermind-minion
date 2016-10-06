@@ -26,8 +26,8 @@ class Command(Base):
     node = Column(String)
     node_backend = Column(String)
 
-    stdout = Column(String)
-    stderr = Column(String)
+    stdout = Column(String, default='')
+    stderr = Column(String, default='')
 
     def status(self):
         cmd = (shlex.split(self.command.encode('utf-8'))
