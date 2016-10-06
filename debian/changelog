@@ -1,3 +1,9 @@
+mastermind-minion (0.64) trusty; urgency=medium
+
+  * Filter out stdout and stderr for 'list' handle
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Thu, 06 Oct 2016 14:49:04 +0300
+
 mastermind-minion (0.63) trusty; urgency=medium
 
   * Store command's update timestamp as an object runtime attribute
