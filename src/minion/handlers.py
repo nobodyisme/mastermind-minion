@@ -132,7 +132,14 @@ class RsyncListHandler(AuthenticationRequestHandler):
     @api_response
     def get(self):
         finish_ts_gte = int(self.get_argument('finish_ts_gte', default=0)) or None
-        return manager.unfinished_commands(finish_ts_gte=finish_ts_gte)
+        result = manager.unfinished_commands(finish_ts_gte=finish_ts_gte)
+
+        # NOTE: filtering out stdout and stderr since mastermind does not use them
+        for command in result.itervalues():
+            del command['output']
+            del command['error_output']
+
+        return result
 
 
 @h.route(app, r'/command/create_group/')
