@@ -18,6 +18,11 @@ class ProgressWatcher(object):
 
         self.command = command
 
+        # timestamp of the last time when command was dumped to db
+        # (required to limit the rate of db dumps when stdout and stderr is updated)
+        # NOTE: this attribute is not part of 'commands' table SQL schema
+        self.command.update_ts = int(time.time())
+
         subprocess.stdout.read_until_close(self.feed,
                                            streaming_callback=self.feed)
         subprocess.stderr.read_until_close(self.feed_error,
@@ -61,7 +66,8 @@ class ProgressWatcher(object):
                 self.command.stderr = self.get_stderr()
                 s.add(self.command)
                 s.commit()
-            except Exception as e:
+                self.command.update_ts = int(time.time())
+            except Exception:
                 logger.exception('pid {0}: failed to update db command'.format(
                     self.subprocess.pid))
                 pass
