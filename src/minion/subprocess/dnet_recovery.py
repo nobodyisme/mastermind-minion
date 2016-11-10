@@ -25,7 +25,7 @@ class DnetRecoverySubprocess(DnetIoclientSubprocess):
 
                 self._set_commands_stats(commands_stats)
 
-            except Exception as e:
+            except Exception:
                 logger.exception(
                     'Failed to parse commands stats file {}'.format(commands_stats_path)
                 )
@@ -41,6 +41,6 @@ class DnetRecoverySubprocess(DnetIoclientSubprocess):
             statuses_count.setdefault(status, 0)
             statuses_count[status] += count
 
-        logger.info('Parsed command statuses: {}'.format(statuses_count))
+        logger.info('Parsed command statuses: {}'.format(op_statuses_count))
 
         self.watcher.set_commands_stats(op_statuses_count)
