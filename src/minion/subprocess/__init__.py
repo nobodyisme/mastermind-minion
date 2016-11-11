@@ -23,9 +23,9 @@ def subprocess_factory(cmd):
     elif cmd[0] == 'remove_group':
         Subprocess = GroupRemover
     elif cmd[0] == 'lrc_convert':
-        Subprocess = UbicSubprocess
+        Subprocess = BaseSubprocess
     elif cmd[0] == 'lrc_validate':
-        Subprocess = UbicSubprocess
+        Subprocess = BaseSubprocess
     elif cmd[0] == 'mds_cleanup':
         Subprocess = BaseSubprocess
     else:
