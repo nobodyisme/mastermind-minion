@@ -1,3 +1,9 @@
+mastermind-minion (0.65) trusty; urgency=medium
+
+  * Update lrc commands to use base subprocess facilities
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 11 Nov 2016 13:46:39 +0300
+
 mastermind-minion (0.64) trusty; urgency=medium
 
   * Filter out stdout and stderr for 'list' handle
