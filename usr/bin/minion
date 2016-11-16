@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import resource
 import traceback
 
 from opster import command
@@ -33,10 +34,27 @@ def main(daemonize=('', False, 'Daemonize this process'),
         run()
 
 
+def setup():
+    if config['common']['dump_core'] == 'True':
+        # allows to store child processes' core dumps
+        logger.info('Setting rlimit_core to unlimited to store core dumps')
+        try:
+            resource.setrlimit(
+                resource.RLIMIT_CORE,
+                (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
+            )
+        except Exception as e:
+            logger.error('Failed to set rlimit_core: {}'.format(e))
+            pass
+
+
 def run():
     logger.info('Starting event loop...')
     app.listen(int(config['common']['port']))
     manager.update_broken_commands()
+
+    setup()
+
     tornado.ioloop.IOLoop.instance().start()
 
 
