@@ -7,7 +7,6 @@ set -e
 
 case "$1" in
     configure)
-    invoke-rc.d syslog-ng restart
 
     mkdir -p /var/run/mastermind-minion
 
