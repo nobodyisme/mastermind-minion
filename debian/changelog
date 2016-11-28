@@ -1,3 +1,9 @@
+mastermind-minion (0.67) trusty; urgency=medium
+
+  * Remove syslog-ng restart in postinst script
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 28 Nov 2016 12:50:33 +0300
+
 mastermind-minion (0.66) trusty; urgency=medium
 
   * Allow storing core dumps for child processes
