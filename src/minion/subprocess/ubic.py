@@ -18,7 +18,7 @@ class UbicSubprocess(BaseSubprocess):
             success_codes=success_codes,
             io_loop=io_loop,
         )
-        if not 'node' in params and not 'node_backend' in params:
+        if 'node' not in params and 'node_backend' not in params:
             raise ValueError('Parameter "node" or "node_backend" is required')
         self.node = params.get('node')
         self.node_backend = params.get('node_backend')
@@ -35,6 +35,27 @@ class UbicSubprocess(BaseSubprocess):
             res['node_backend'] = self.node_backend
         return res
 
+    def stop_file(self):
+        if self.params.get('create_stop_file'):
+            stop_file = self.params['create_stop_file']
+            try:
+                open(stop_file, 'w').close()
+            except Exception as e:
+                logger.error('Failed to create backend stop marker: {0}'.format(e))
+            else:
+                logger.info('Successfully created backend stop marker: {0}'.format(
+                    stop_file))
+
+        if self.params.get('remove_stop_file'):
+            stop_file = self.params['remove_stop_file']
+            try:
+                os.remove(stop_file)
+            except Exception as e:
+                logger.error('Failed to remove backend stop marker: {0}'.format(e))
+            else:
+                logger.info('Successfully removed backend stop marker: {0}'.format(
+                    stop_file))
+
     def create_group_file_marker(self):
         if self.params.get('group_file_marker'):
             try:
@@ -49,12 +70,13 @@ class UbicSubprocess(BaseSubprocess):
                     f.write(group)
             except Exception as e:
                 logger.exception('Failed to create group file marker: {0}'.format(e))
+                self.stop_file()
             else:
                 logger.info('Successfully created group file marker '
                             'for group {0}'.format(group))
         else:
             logger.info('Group file marker creation was not requested for '
-                'group {0}'.format(self.params.get('group')))
+                        'group {0}'.format(self.params.get('group')))
 
         if self.params.get('remove_group_file'):
             logger.info('Removing group file {0}'.format(self.params['remove_group_file']))
@@ -62,12 +84,13 @@ class UbicSubprocess(BaseSubprocess):
                 os.remove(self.params['remove_group_file'])
             except Exception as e:
                 logger.exception('Failed to remove group file: {0}'.format(e))
+                self.stop_file()
             else:
                 logger.info('Successfully removed group '
                             'file {0}'.format(self.params['remove_group_file']))
         else:
             logger.info('Group file removal was not requested for '
-                'group {0}'.format(self.params.get('group')))
+                        'group {0}'.format(self.params.get('group')))
 
         if self.params.get('move_dst') and self.params.get('move_src'):
             try:
@@ -75,6 +98,7 @@ class UbicSubprocess(BaseSubprocess):
             except Exception as e:
                 logger.exception('Failed to execute move task: {0} to {1}'.format(
                     self.params['move_src'], self.params['move_dst']))
+                self.stop_file()
             else:
                 logger.info('Successfully performed move task: {0} to {1}'.format(
                     self.params['move_src'], self.params['move_dst']))
@@ -85,16 +109,21 @@ class UbicSubprocess(BaseSubprocess):
                 open(marker, 'w').close()
             except Exception as e:
                 logger.error('Failed to create backend down marker: {0}'.format(e))
+                self.stop_file()
             else:
                 logger.info('Successfully created backend down marker: {0}'.format(
-                    self.params['mark_backend']))
+                    marker))
 
         if self.params.get('unmark_backend'):
             marker = self.params['unmark_backend']
             try:
-                os.remove(self.params['unmark_backend'])
+                os.remove(marker)
             except Exception as e:
                 logger.error('Failed to remove backend down marker: {0}'.format(e))
+                self.stop_file()
             else:
                 logger.info('Successfully removed backend down marker: {0}'.format(
-                    self.params['unmark_backend']))
+                    marker))
+
+        if self.params.get('force_stop_file'):
+            self.stop_file()
