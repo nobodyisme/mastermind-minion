@@ -34,8 +34,8 @@ class RsyncWatcher(ProgressWatcher):
     SPLIT_RE = re.compile(r'\r|\n')
     FILES_CNT_RE = re.compile(r'(\d+)/(\d+)')
 
-    def __init__(self, subprocess, command, success_codes=None):
-        super(RsyncWatcher, self).__init__(subprocess, command, success_codes=success_codes)
+    def __init__(self, command, subprocess, success_codes=None):
+        super(RsyncWatcher, self).__init__(command, subprocess, success_codes=success_codes)
         self.current_file = 0
         self.total_files = 20  # first estimation of total files num
 
@@ -43,7 +43,7 @@ class RsyncWatcher(ProgressWatcher):
 
     def feed(self, s):
         super(RsyncWatcher, self).feed(s)
-        if self.exit:
+        if self._exit:
             return
         data = self.SPLIT_RE.split(s)
         if not data:
@@ -58,7 +58,7 @@ class RsyncWatcher(ProgressWatcher):
         parts = filter(None, s.split(' '))
         if len(parts) < 2:
             return
-        if not '%' in parts[1]:
+        if '%' not in parts[1]:
             return
 
         percentage = int(parts[1][:-1])

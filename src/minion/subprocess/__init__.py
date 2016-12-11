@@ -1,33 +1,46 @@
+from minion.subprocess.base import BaseCommand
 from minion.subprocess.rsync import RsyncSubprocess
-from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
-from minion.subprocess.dnet_client import DnetClientSubprocess
+from minion.subprocess.create_group_file import CreateGroupFileCommand
+from minion.subprocess.remove_path import RemovePathCommand
+from minion.subprocess.create_ids_file import CreateIdsFileCommand
 from minion.subprocess.dnet_recovery import DnetRecoverySubprocess
 from minion.subprocess.ubic import UbicSubprocess
-from minion.subprocess.executor import GroupCreator, GroupRemover
-from minion.subprocess.base import BaseSubprocess
+from minion.subprocess.dnet_client import DnetClientSubprocess
+from minion.subprocess.lrc_convert import LrcConvertSubprocess
+from minion.subprocess.lrc_validate import LrcValidateSubprocess
+from minion.subprocess.mds_cleanup import MdsCleanupSubprocess
+from minion.subprocess.create_group import CreateGroupCommand
+from minion.subprocess.remove_group import RemoveGroupCommand
+
+__all__ = (
+    RsyncSubprocess,
+    DnetRecoverySubprocess,
+    UbicSubprocess,
+    DnetClientSubprocess,
+    LrcConvertSubprocess,
+    LrcValidateSubprocess,
+    MdsCleanupSubprocess,
+
+    CreateGroupFileCommand,
+    RemovePathCommand,
+    CreateIdsFileCommand,
+    CreateGroupCommand,
+    RemoveGroupCommand,
+)
+
+
+COMMAND_SUBPROCESS = {}
+
+for subprocess_type in __all__:
+    if not issubclass(subprocess_type, BaseCommand):
+        # sanity check
+        continue
+
+    COMMAND_SUBPROCESS[subprocess_type.COMMAND] = subprocess_type
 
 
 def subprocess_factory(cmd):
-    if cmd[0] == 'rsync':
-        Subprocess = RsyncSubprocess
-    elif cmd[0] == 'dnet_recovery':
-        Subprocess = DnetRecoverySubprocess
-    elif cmd[0] == 'dnet_ioclient':
-        Subprocess = DnetIoclientSubprocess
-    elif cmd[0] == 'dnet_client':
-        Subprocess = DnetClientSubprocess
-    elif cmd[0] == 'ubic':
-        Subprocess = UbicSubprocess
-    elif cmd[0] == 'create_group':
-        Subprocess = GroupCreator
-    elif cmd[0] == 'remove_group':
-        Subprocess = GroupRemover
-    elif cmd[0] == 'lrc_convert':
-        Subprocess = BaseSubprocess
-    elif cmd[0] == 'lrc_validate':
-        Subprocess = BaseSubprocess
-    elif cmd[0] == 'mds_cleanup':
-        Subprocess = BaseSubprocess
-    else:
-        raise ValueError('Unsupported command: {0}'.format(cmd[0]))
-    return Subprocess
+    if cmd[0] not in COMMAND_SUBPROCESS:
+        raise ValueError('Unsupported command "{}"'.format(cmd[0]))
+
+    return COMMAND_SUBPROCESS[cmd[0]]

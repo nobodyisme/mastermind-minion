@@ -1,5 +1,3 @@
-import collections
-import copy
 import os
 import shlex
 import time
@@ -12,11 +10,7 @@ from minion.logger import logger
 from minion.db import Session
 from minion.db.commands import Command
 from minion.subprocess import subprocess_factory
-from minion.subprocess.rsync import RsyncSubprocess
-from minion.subprocess.dnet_ioclient import DnetIoclientSubprocess
-from minion.subprocess.dnet_client import DnetClientSubprocess
-from minion.subprocess.dnet_recovery import DnetRecoverySubprocess
-from minion.subprocess.ubic import UbicSubprocess
+from minion.subprocess.base_shell import BaseSubprocess
 
 
 class SubprocessManager(object):
@@ -57,10 +51,10 @@ class SubprocessManager(object):
 
     def get_subprocess(self, cmd, params):
         Subprocess = subprocess_factory(cmd)
-        if issubclass(Subprocess, RsyncSubprocess):
-            self.check_group(params.get('group', 0))
-        elif issubclass(Subprocess, (DnetIoclientSubprocess, UbicSubprocess)):
-            self.check_node(params.get('node'), params.get('node_backend'))
+        if 'group' in params:
+            self.check_group(params['group'])
+        if 'node_backend' in params:
+            self.check_node_backend(params['node_backend'])
         return Subprocess
 
     def run(self, command, params, env=None, success_codes=None):
@@ -85,29 +79,13 @@ class SubprocessManager(object):
                 return running_uid
         Subprocess = self.get_subprocess(cmd, params)
         uid = uuid.uuid4().hex
-        sub = Subprocess(uid, cmd, params=params, env=env, success_codes=success_codes)
+        if issubclass(Subprocess, BaseSubprocess):
+            sub = Subprocess(uid, cmd, params=params, env=env, success_codes=success_codes)
+        else:
+            sub = Subprocess(uid, params=params)
         sub.run()
+        logger.info('command execution started successfully: {}'.format(sub))
 
-        logger.info('command execution started successfully, pid: {0}'.format(sub.pid))
-        self.subprocesses[uid] = sub
-        return uid
-
-    def execute(self, subprocess, cmd=None, params=None):
-        logger.info(
-            'Execute subprocess: {subprocess}, cmd={cmd}'.format(
-                subprocess=subprocess,
-                cmd=cmd,
-            )
-        )
-        cmd = (shlex.split(cmd)
-               if isinstance(cmd, basestring) else
-               cmd)
-
-        uid = uuid.uuid4().hex
-        sub = subprocess(uid, cmd or [], params=params or {})
-        sub.run()
-
-        logger.info('Subprocess executed successfully')
         self.subprocesses[uid] = sub
         return uid
 
@@ -156,22 +134,20 @@ class SubprocessManager(object):
 
     def check_group(self, group):
         for subprocess in self.subprocesses.itervalues():
-            if not isinstance(subprocess, RsyncSubprocess):
-                continue
-            status = subprocess.status()
-            if status['group'] == group and status['progress'] < 1.0:
-                raise ValueError('Task for group {0} is already running, '
-                    'pid: {1}'.format(group, status['pid']))
+            if subprocess.params.get('group') == group and subprocess.finish_ts is None:
+                raise ValueError(
+                    'Task for group {} is already running, {}'.format(group, subprocess)
+                )
 
-    def check_node(self, node, node_backend):
+    def check_node_backend(self, node_backend):
         for subprocess in self.subprocesses.itervalues():
-            status = subprocess.status()
-            if node and status.get('node') == node and status['progress'] < 1.0:
-                raise ValueError('Task for node {0} is already running, '
-                    'pid: {1}'.format(node, status['pid']))
-            elif node_backend and status.get('node_backend') == node_backend and status['progress'] < 1.0:
-                raise ValueError('Task for node backend {0} is already running, '
-                    'pid: {1}'.format(node_backend, status['pid']))
+            if subprocess.params.get('node_backend') == node_backend and subprocess.finish_ts is None:
+                raise ValueError(
+                    'Task for node backend {} is already running: {}'.format(
+                        node_backend,
+                        subprocess
+                    )
+                )
 
     def try_find_running_subprocess(self, task_id):
         for uid, subprocess in self.subprocesses.iteritems():

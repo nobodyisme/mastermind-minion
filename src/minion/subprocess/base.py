@@ -1,112 +1,87 @@
-import ConfigParser
-import copy
-import os
-import shlex
-import signal
 import time
 
 from tornado.ioloop import IOLoop
-from tornado.process import Subprocess
 
-from minion.config import config
 from minion.db import Session
 import minion.db.commands
-from minion.watchers.base import ProgressWatcher
+from minion.logger import logger
 
 
-class BaseSubprocess(object):
+class BaseCommand(object):
 
-    def __init__(self, uid, cmd, params=None, env=None, success_codes=None, io_loop=IOLoop.instance()):
+    # TODO: make it a proprty to throw not implemented exception?
+    COMMAND = 'command'
+    REQUIRED_PARAMS = ()
+
+    def __init__(self, uid, params=None, io_loop=IOLoop.instance()):
         self.uid = uid
-        self.cmd = cmd
-        self.cmd_str = ' '.join(self.cmd)
-        self.env = copy.copy(os.environ)
-        config_env = self._get_config_env_vars(cmd[0])
-        if config_env:
-            self.env.update(config_env)
-        if env:
-            self.env.update(env)
-        self.process = None
-        self.watcher = None
         self.params = params
-        self.success_codes = success_codes
         self.io_loop = io_loop
 
-    def _get_config_env_vars(self, command):
-        env_dict = config.get('{command}_env'.format(command=command), {})
+        self.error = None
+        self.start_ts = None
+        self.finish_ts = None
 
-        # NOTE: ConfigParser.items lowercases option names
-        # NOTE: Section's dict stores the section name itself under '__name__'
-        # key, it should be skipped
-        return dict(
-            (env_var_name.upper(), env_var_value)
-            for env_var_name, env_var_value in env_dict.iteritems()
-            if not env_var_name.startswith('__')
-        )
+        for param_name in self.REQUIRED_PARAMS:
+            if param_name not in params:
+                raise ValueError('Parameter "{}" is required'.format(param_name))
+
+    def execute(self):
+        raise NotImplemented("Command should implement 'execute' method")
 
     def run(self):
-        self.process = Subprocess(self.cmd,
-                                  stdout=Subprocess.STREAM,
-                                  stderr=Subprocess.STREAM,
-                                  env=self.env,
-                                  io_loop=self.io_loop)
+
+        self.start_ts = int(time.time())
 
         # create db record
         s = Session()
         s.begin()
-        command = minion.db.commands.Command(uid=self.uid,
-                          pid=self.process.pid,
-                          command=self.cmd_str,
-                          start_ts=int(time.time()),
-                          task_id=self.params.get('task_id'))
-        #TODO:
-        #what about group_id, node, node_backend ?
+        command = minion.db.commands.Command(
+            uid=self.uid,
+            pid=None,
+            command=self.COMMAND,
+            start_ts=self.start_ts,
+            task_id=self.params.get('task_id')
+        )
 
         s.update_ts = int(time.time())
         s.add(command)
         s.commit()
 
-        self.watcher = self.watch(command)
+        try:
+            self.execute()
+        except Exception as e:
+            logger.exception('Command execution failed')
+            self.error = e
 
-    def watch(self, command):
-        return self.watcher_base(self.process, command, success_codes=self.success_codes)
+        self.finish_ts = int(time.time())
 
-    watcher_base = ProgressWatcher
-
-    @property
-    def pid(self):
-        assert self.process
-        return self.process.pid
+        s.begin()
+        try:
+            command.progress = 1.0
+            command.exit_code = 1 if self.error else 0
+            command.command_code = 1 if self.error else 0
+            command.finish_ts = self.finish_ts
+            s.add(command)
+            s.commit()
+        except Exception as e:
+            logger.exception('Failed to update db command')
+            s.rollback()
 
     def status(self):
-        assert self.process
-        assert self.watcher
-
-        res = self.watcher.status()
-        res.update({
-            'pid': self.process.pid,
-            'command': self.cmd_str,
+        return {
+            'progress': 1.0,
+            'exit_code': 1 if self.error else 0,
+            'exit_message': str(self.error) if self.error else 'Success',
+            'command_code': 1 if self.error else 0,
+            'start_ts': self.start_ts,
+            'finish_ts': self.finish_ts,
+            'output': '',
+            'error_output': '',
+            'pid': None,
             'task_id': self.params.get('task_id'),
-        })
+            'command': self.COMMAND,
+        }
 
-        return res
-
-    def terminate(self):
-        if self.process.returncode is None:
-            self.__children_pids(self.__terminate_pid_tree)
-
-    def __children_pids(self, callback):
-        cmd_str = 'pgrep -P {pid}'.format(pid=self.process.pid)
-        sub = Subprocess(shlex.split(cmd_str),
-                         stdout=Subprocess.STREAM,
-                         stderr=Subprocess.STREAM,
-                         io_loop=self.io_loop)
-        sub.stdout.read_until_close(callback=callback)
-
-    def __terminate_pid_tree(self, pids):
-        tree_pids = pids.strip() + ' ' + str(self.process.pid)
-        cmd_str = 'kill ' + tree_pids
-        sub = Subprocess(shlex.split(cmd_str),
-                         stdout=Subprocess.STREAM,
-                         stderr=Subprocess.STREAM,
-                         io_loop=self.io_loop)
+    def __str__(self):
+        return '<{}: {}>'.format(type(self).__name__, self.COMMAND)
