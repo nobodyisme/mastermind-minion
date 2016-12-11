@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, Float, String
 
 from minion.db import Base
 from minion import subprocess
+from minion.subprocess.base_shell import BaseSubprocess
 
 
 class Command(Base):
@@ -16,6 +17,7 @@ class Command(Base):
     progress = Column(Float, nullable=False, default=0.0)
 
     exit_code = Column(Integer)
+    # TODO: add exit message to scheme?
     command_code = Column(Integer)
 
     start_ts = Column(Integer, nullable=False)
@@ -34,14 +36,18 @@ class Command(Base):
                if isinstance(self.command, basestring) else
                self.command)
         Subprocess = subprocess.subprocess_factory(cmd)
-        Watcher = Subprocess.watcher_base
+        if issubclass(Subprocess, BaseSubprocess):
+            Watcher = Subprocess.watcher_base
+            exit_message = Watcher.exit_messages.get(self.exit_code, 'Unknown')
+        else:
+            exit_message = 'Success' if self.exit_code == 0 else ''
         return {
             'pid': self.pid,
             'command': self.command,
             'task_id': self.task_id,
             'progress': self.progress,
             'exit_code': self.exit_code,
-            'exit_message': Watcher.exit_messages.get(self.exit_code, 'Unknown'),
+            'exit_message': exit_message,
             'command_code': self.command_code,
             'start_ts': self.start_ts,
             'finish_ts': self.finish_ts,
