@@ -38,13 +38,22 @@ class SubprocessManager(object):
                     c.exit_code = 666
                     c.finish_ts = int(time.time())
                     s.add(c)
-                    logger.info('Command {0}, pid {1} is considered broken, '
-                        'will be marked as finished'.format(c.uid, c.pid))
+                    logger.info(
+                        'Command {}, pid {} is considered broken, will be marked as '
+                        'finished'.format(
+                            c.uid,
+                            c.pid
+                        )
+                    )
                 else:
-                    logger.warn('Command {0}, pid {1} is considered broken, '
-                        'but process is running'.format(c.uid, c.pid))
+                    logger.warn(
+                        'Command {}, pid {} is considered broken, but process is running'.format(
+                            c.uid,
+                            c.pid
+                        )
+                    )
             s.commit()
-        except Exception as e:
+        except Exception:
             logger.exception('Failed to update broken commands')
             s.rollback()
             raise
@@ -73,9 +82,13 @@ class SubprocessManager(object):
             running_uid = self.try_find_running_subprocess(params['task_id'])
             if running_uid:
                 running_sub = self.subprocesses[running_uid]
-                logger.info('command execution is not required, '
-                    'process for task {0} is already running: {1}'.format(
-                        params['task_id'], running_sub.status()))
+                logger.info(
+                    'command execution is not required, process for task {} is already running: '
+                    '{}'.format(
+                        params['task_id'],
+                        running_sub.status()
+                    )
+                )
                 return running_uid
         Subprocess = self.get_subprocess(cmd, params)
         uid = uuid.uuid4().hex
@@ -114,23 +127,26 @@ class SubprocessManager(object):
         # 2. Updating with in-memory commands
         for uid, sp in self.subprocesses.iteritems():
             cmd_status = sp.status()
-            if (finish_ts_gte and cmd_status['finish_ts'] and
-                cmd_status['finish_ts'] < finish_ts_gte):
+            if (
+                finish_ts_gte and
+                cmd_status['finish_ts'] and
+                cmd_status['finish_ts'] < finish_ts_gte
+            ):
                 continue
             res[uid] = cmd_status
         return res
 
     def terminate(self, uid):
-        if not uid in self.subprocesses:
+        if uid not in self.subprocesses:
             raise ValueError('Unknown command uid: {0}'.format(uid))
-        logger.info('terminating command {0}, pid: {1}'.format(uid,
-            self.subprocesses[uid].process.pid))
+        logger.info(
+            'terminating command {}, pid: {}'.format(uid, self.subprocesses[uid].process.pid)
+        )
 
         # result, error, sub = self.subprocesses[uid].terminate().result()
         code = self.subprocesses[uid].terminate()
         if code:
-            raise RuntimeError('Failed to terminate command {0}, '
-                'exit code: {1}'.format(uid, code))
+            raise RuntimeError('Failed to terminate command {}, exit code: {}'.format(uid, code))
 
     def check_group(self, group):
         for subprocess in self.subprocesses.itervalues():
