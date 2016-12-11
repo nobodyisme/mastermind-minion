@@ -1,3 +1,9 @@
+mastermind-minion (1.1) trusty; urgency=medium
+
+  * Refactor commands and subprocesses
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 12 Dec 2016 00:43:57 +0300
+
 mastermind-minion (0.68) trusty; urgency=medium
 
   * UbicSubprocess: create stop file
