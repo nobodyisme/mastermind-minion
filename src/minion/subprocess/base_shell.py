@@ -1,4 +1,5 @@
 import copy
+import json
 import os
 import shlex
 import time
@@ -74,7 +75,8 @@ class BaseSubprocess(BaseCommand):
             pid=self.process.pid,
             command=self.cmd_str,
             start_ts=int(time.time()),
-            task_id=self.params.get('task_id')
+            task_id=self.params.get('task_id'),
+            artifacts=json.dumps(self.artifacts),
         )
 
         s.update_ts = int(time.time())
@@ -179,10 +181,9 @@ class BaseSubprocess(BaseCommand):
     def on_command_completed(self):
 
         self.finish_ts = int(time.time())
+        self.artifacts = self.collect_artifacts()
 
         self.on_update_progress()
-
-        self.artifacts = self.collect_artifacts()
 
         if not self._apply_postprocessors():
             # TODO: add status codes

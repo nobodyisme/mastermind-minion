@@ -81,6 +81,7 @@ class BaseCommand(object):
             'pid': None,
             'task_id': self.params.get('task_id'),
             'command': self.COMMAND,
+            'artifacts': {},
         }
 
     def __str__(self):
