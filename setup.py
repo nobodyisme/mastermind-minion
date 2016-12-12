@@ -7,6 +7,7 @@ setup(
     author="Andrey Vasilenkov",
     author_email="indigo@yandex-team.ru",
     packages=['minion',
+              'minion.artifacts',
               'minion.watchers',
               'minion.subprocess',
               'minion.db'],
