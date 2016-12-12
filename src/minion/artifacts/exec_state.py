@@ -25,7 +25,7 @@ class ExecStateArtifactsMixin(object):
         exec_state = {}
 
         try:
-            with open(exec_state, 'rb') as f:
+            with open(exec_state_path, 'rb') as f:
                 exec_state = json.load(f).get('status', {})
         except Exception:
             logger.exception(
