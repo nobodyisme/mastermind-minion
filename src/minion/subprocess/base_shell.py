@@ -76,7 +76,6 @@ class BaseSubprocess(BaseCommand):
             command=self.cmd_str,
             start_ts=int(time.time()),
             task_id=self.params.get('task_id'),
-            artifacts=json.dumps(self.artifacts),
         )
 
         s.update_ts = int(time.time())
@@ -153,6 +152,7 @@ class BaseSubprocess(BaseCommand):
             command.stdout = self.watcher.get_stdout()
             command.stderr = self.watcher.get_stderr()
             if command.exit_code is not None:
+                command.artifacts = json.dumps(self.artifacts)
                 command.finish_ts = self.finish_ts
             s.add(command)
             s.commit()
