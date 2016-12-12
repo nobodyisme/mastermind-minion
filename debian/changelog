@@ -1,3 +1,9 @@
+mastermind-minion (1.2) trusty; urgency=medium
+
+  * Collect artifacts from lrc_convert and lrc_validate commands
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 12 Dec 2016 22:23:57 +0300
+
 mastermind-minion (1.1) trusty; urgency=medium
 
   * Refactor commands and subprocesses
