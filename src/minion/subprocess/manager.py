@@ -168,7 +168,7 @@ class SubprocessManager(object):
     def try_find_running_subprocess(self, task_id):
         for uid, subprocess in self.subprocesses.iteritems():
             status = subprocess.status()
-            if status.get('task_id', None) == task_id:
+            if status.get('task_id', None) == task_id and (status['exit_code'] == 0 or status['progress'] < 1.0):
                 return uid
 
 
