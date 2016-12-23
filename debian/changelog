@@ -1,3 +1,9 @@
+mastermind-minion (1.9) trusty; urgency=medium
+
+  * Fix for checking task id against completed commands as well
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 23 Dec 2016 18:55:08 +0300
+
 mastermind-minion (1.8) trusty; urgency=medium
 
   * Check task id against completed commands as well
