@@ -39,7 +39,20 @@ class DnetRecoverySubprocess(BaseSubprocess):
                 'Failed to parse commands stats file {}'.format(commands_stats_path)
             )
 
-        # NOTE: temporary backward compatibility
-        self.commands_stats = commands_stats
+        parsed_stats = self._parse_commands_stats(commands_stats)
 
-        return commands_stats
+        # NOTE: temporary backward compatibility
+        self.commands_stats = parsed_stats
+        return parsed_stats
+
+    def _parse_commands_stats(self, commands_stats):
+        op_statuses_count = {}
+        for operation_status, count in commands_stats.iteritems():
+            operation, status = operation_status.split('.', 1)
+            statuses_count = op_statuses_count.setdefault(operation, {})
+            statuses_count.setdefault(status, 0)
+            statuses_count[status] += count
+
+        logger.info('Parsed command statuses: {}'.format(op_statuses_count))
+
+        return op_statuses_count
