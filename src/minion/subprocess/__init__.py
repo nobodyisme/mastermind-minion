@@ -11,6 +11,7 @@ from minion.subprocess.lrc_validate import LrcValidateSubprocess
 from minion.subprocess.mds_cleanup import MdsCleanupSubprocess
 from minion.subprocess.create_group import CreateGroupCommand
 from minion.subprocess.remove_group import RemoveGroupCommand
+from minion.subprocess.lrc_recover import LrcRecoverSubprocess
 
 __all__ = (
     RsyncSubprocess,
@@ -20,6 +21,7 @@ __all__ = (
     LrcConvertSubprocess,
     LrcValidateSubprocess,
     MdsCleanupSubprocess,
+    LrcRecoverSubprocess,
 
     CreateGroupFileCommand,
     RemovePathCommand,
