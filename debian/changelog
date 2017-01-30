@@ -1,3 +1,9 @@
+mastermind-minion (1.11) trusty; urgency=medium
+
+  * Add handler for executing commands
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 30 Jan 2017 17:59:49 +0300
+
 mastermind-minion (1.10) trusty; urgency=medium
 
   * Add lrc_recover command
