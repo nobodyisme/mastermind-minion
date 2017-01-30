@@ -212,15 +212,15 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
         self.add_header('Location', self.reverse_url('status', uid))
 
 
-@h.route(app, r'/command/dnet_client/')
-class DnetClientCmdHandler(AuthenticationRequestHandler):
+@h.route(app, r'/command/(.+)/')
+class CmdHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
-    def post(self):
+    def post(self, cmd):
         params = {
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
-        uid = manager.run('dnet_client', params=params)
+        uid = manager.run(cmd, params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
