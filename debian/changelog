@@ -1,3 +1,9 @@
+mastermind-minion (1.13) trusty; urgency=medium
+
+  * Fix move_path
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 01 Feb 2017 16:45:02 +0300
+
 mastermind-minion (1.12) trusty; urgency=medium
 
   * Create backend stop file if move_path failed
