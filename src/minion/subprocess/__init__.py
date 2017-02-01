@@ -12,6 +12,11 @@ from minion.subprocess.mds_cleanup import MdsCleanupSubprocess
 from minion.subprocess.create_group import CreateGroupCommand
 from minion.subprocess.remove_group import RemoveGroupCommand
 from minion.subprocess.lrc_recover import LrcRecoverSubprocess
+from minion.subprocess.move_path import MovePathCommand
+from minion.subprocess.lock_backend import LockBackendCommand
+from minion.subprocess.create_file_marker import CreateFileMarkerCommand
+from minion.subprocess.unlock_backend import UnlockBackendCommand
+from minion.subprocess.remove_group_file import RemoveGroupFileCommand
 
 __all__ = (
     RsyncSubprocess,
@@ -28,6 +33,11 @@ __all__ = (
     CreateIdsFileCommand,
     CreateGroupCommand,
     RemoveGroupCommand,
+    MovePathCommand,
+    LockBackendCommand,
+    CreateFileMarkerCommand,
+    UnlockBackendCommand,
+    RemoveGroupFileCommand,
 )
 
 
