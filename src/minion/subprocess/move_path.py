@@ -7,7 +7,7 @@ from minion.subprocess.base import BaseCommand
 class MovePathCommand(BaseCommand):
 
     COMMAND = 'move_path'
-    REQUIRED_PARAMS = ('move_src', 'move_dst', 'stop_backend')
+    REQUIRED_PARAMS = ('move_src', 'move_dst')
 
     def execute(self):
         try:
