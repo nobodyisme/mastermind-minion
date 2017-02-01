@@ -7,7 +7,7 @@ from minion.subprocess.base import BaseCommand
 
 class CreateFileMarkerCommand(BaseCommand):
 
-    COMMAND = 'create_group_file'
+    COMMAND = 'create_file_marker'
     REQUIRED_PARAMS = ('group_file_marker',)
 
     def execute(self):
