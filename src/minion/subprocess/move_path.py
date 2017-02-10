@@ -21,7 +21,8 @@ class MovePathCommand(BaseCommand):
             marker = self.params.get('stop_backend')
             if marker:
                 try:
-                    open(marker, 'w').close()
+                    with open(marker, 'w') as f:
+                        f.write(self.params['move_src'])
                 except Exception as e:
                     logger.error('Failed to create backend stop file: {}'.format(e))
                     raise

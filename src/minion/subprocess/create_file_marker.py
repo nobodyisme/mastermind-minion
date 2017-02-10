@@ -16,8 +16,8 @@ class CreateFileMarkerCommand(BaseCommand):
             if 'group' in self.params.get('group') else
             ''
         )
+        path = self.params['group_file_marker'].format(group_id=group)
         try:
-            path = self.params['group_file_marker'].format(group_id=group)
             dirname = os.path.dirname(path)
             if not os.path.exists(dirname):
                 os.makedirs(dirname, 0755)
@@ -28,7 +28,8 @@ class CreateFileMarkerCommand(BaseCommand):
             marker = self.params.get('stop_backend')
             if marker:
                 try:
-                    open(marker, 'w').close()
+                    with open(marker, 'w') as f:
+                        f.write(path)
                 except Exception as e:
                     logger.error('Failed to create backend stop file: {}'.format(e))
                     raise
