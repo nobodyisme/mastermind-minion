@@ -15,5 +15,13 @@ class RemoveGroupFileCommand(BaseCommand):
             os.remove(self.params['remove_group_file'])
         except Exception as e:
             logger.error('Failed to remove group file: {}'.format(e))
-            raise
+            marker = self.params.get('stop_backend')
+            if marker:
+                try:
+                    open(marker, 'w').close()
+                except Exception as e:
+                    logger.error('Failed to create backend stop file: {}'.format(e))
+                    raise
+            else:
+                raise
         logger.info('Successfully removed group file {}'.format(self.params['remove_group_file']))

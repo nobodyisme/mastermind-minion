@@ -25,5 +25,13 @@ class CreateFileMarkerCommand(BaseCommand):
                 f.write(group)
         except Exception as e:
             logger.error('Failed to create group file marker: {}'.format(e))
-            raise
+            marker = self.params.get('stop_backend')
+            if marker:
+                try:
+                    open(marker, 'w').close()
+                except Exception as e:
+                    logger.error('Failed to create backend stop file: {}'.format(e))
+                    raise
+            else:
+                raise
         logger.info('Successfully created group file marker for group {}'.format(group))
