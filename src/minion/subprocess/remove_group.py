@@ -45,6 +45,8 @@ class RemoveGroupCommand(BaseCommand):
                     pass
                 else:
                     raise
+            else:
+                raise
         except Exception:
             logger.exception('Failed to rename tmp dir to dest dir')
             raise

@@ -1,3 +1,10 @@
+mastermind-minion (1.16) trusty; urgency=medium
+
+  * Fix remove group handler, should stop execution if failed to rename
+  backend dir
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 13 Feb 2017 15:49:09 +0300
+
 mastermind-minion (1.15) trusty; urgency=medium
 
   * Write path in stop file
