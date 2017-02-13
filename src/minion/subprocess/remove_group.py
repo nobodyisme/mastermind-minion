@@ -11,7 +11,10 @@ class RemoveGroupCommand(BaseCommand):
     REQUIRED_PARAMS = ('group_base_path',)
 
     def removed_basename(self, basename):
-        return 'removed_backend.{basename}'.format(basename=basename)
+        return 'removed_backend.{basename}.{group}'.format(
+            basename=basename,
+            group=self.params['group'],
+        )
 
     def execute(self):
         group_base_path = self.params['group_base_path'].rstrip('/')

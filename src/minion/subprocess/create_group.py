@@ -10,9 +10,6 @@ class CreateGroupCommand(BaseCommand):
     COMMAND = 'create_group'
     REQUIRED_PARAMS = ('group_base_path_root_dir', 'files')
 
-    def removed_basename(self, basename):
-        return 'removed_backend.{basename}'.format(basename=basename)
-
     def tmp_basename(self, basename):
         return 'new_backend.{basename}'.format(basename=basename)
 
@@ -24,10 +21,7 @@ class CreateGroupCommand(BaseCommand):
             tmp_basename = self.tmp_basename(str(free_basename))
             tmp_dir = os.path.join(base_path, tmp_basename)
 
-            removed_basename = self.removed_basename(str(free_basename))
-            removed_dir = os.path.join(base_path, removed_basename)
-
-            if any(map(os.path.exists, [dest_dir, tmp_dir, removed_dir])):
+            if any(map(os.path.exists, [dest_dir, tmp_dir])):
                 free_basename += 1
                 continue
             break
