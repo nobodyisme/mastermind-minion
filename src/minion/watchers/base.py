@@ -54,11 +54,13 @@ class ProgressWatcher(object):
 
     def _feed(self, s):
         self._append_chunk_to_window(self.output, s)
+        logger.info('pid {}: stdout feed, {} bytes'.format(self.subprocess.pid, len(s)))
         self.output_size = min(self.OUTPUT_WINDOW_SIZE, self.output_size + len(s))
         self._update_db_dump()
 
     def _feed_error(self, s):
         self._append_chunk_to_window(self.error_output, s)
+        logger.info('pid {}: stderr feed, {} bytes'.format(self.subprocess.pid, len(s)))
         self.error_output_size = min(self.OUTPUT_WINDOW_SIZE, self.error_output_size + len(s))
         self._update_db_dump()
 
