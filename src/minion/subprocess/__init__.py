@@ -17,6 +17,7 @@ from minion.subprocess.lock_backend import LockBackendCommand
 from minion.subprocess.create_file_marker import CreateFileMarkerCommand
 from minion.subprocess.unlock_backend import UnlockBackendCommand
 from minion.subprocess.remove_group_file import RemoveGroupFileCommand
+from minion.subprocess.check_file_system import CheckFileSystemCommand
 
 __all__ = (
     RsyncSubprocess,
@@ -38,6 +39,7 @@ __all__ = (
     CreateFileMarkerCommand,
     UnlockBackendCommand,
     RemoveGroupFileCommand,
+    CheckFileSystemCommand,
 )
 
 
