@@ -1,3 +1,10 @@
+mastermind-minion (1.19) trusty; urgency=medium
+
+  * Unmark backend: skip -2 err
+  * Complete command execution when stdout and stderr are exhausted
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 01 Mar 2017 12:45:37 +0300
+
 mastermind-minion (1.18) trusty; urgency=medium
 
   * Debug logging added
