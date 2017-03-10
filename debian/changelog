@@ -1,3 +1,9 @@
+mastermind-minion (1.20) trusty; urgency=medium
+
+  * Add check_file_system command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 10 Mar 2017 19:50:56 +0300
+
 mastermind-minion (1.19) trusty; urgency=medium
 
   * Unmark backend: skip -2 err
