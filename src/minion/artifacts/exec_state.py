@@ -1,7 +1,7 @@
 import json
 import os.path
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 
 
 class ExecStateArtifactsMixin(object):
@@ -15,12 +15,12 @@ class ExecStateArtifactsMixin(object):
                 break
 
         if not tmp_dir:
-            logger.info('Failed to determine tmp directory')
+            cmd_logger.info('Failed to determine tmp directory', extra=self.log_extra)
             return {}
 
         exec_state_path = os.path.join(tmp_dir, 'exec_state')
 
-        logger.info('Parsing exec state: {}'.format(exec_state_path))
+        cmd_logger.info('Parsing exec state: {}'.format(exec_state_path), extra=self.log_extra)
 
         exec_state = {}
 
@@ -28,8 +28,9 @@ class ExecStateArtifactsMixin(object):
             with open(exec_state_path, 'rb') as f:
                 exec_state = json.load(f).get('status', {})
         except Exception:
-            logger.exception(
-                'Failed to parse exec state file {}'.format(exec_state_path)
+            cmd_logger.exception(
+                'Failed to parse exec state file {}'.format(exec_state_path),
+                extra=self.log_extra,
             )
             pass
 

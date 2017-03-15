@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -34,16 +34,16 @@ class CreateGroupCommand(BaseCommand):
         tmp_basename = self.tmp_basename(basename)
 
         tmp_dir = os.path.join(group_base_path_root_dir, tmp_basename)
-        logger.info('Creating tmp dir for new group: {}'.format(tmp_dir))
+        cmd_logger.info('Creating tmp dir for new group: {}'.format(tmp_dir), extra=self.log_extra)
         try:
             os.mkdir(tmp_dir, 0755)
         except Exception:
-            logger.exception('Failed to create tmp dir for new group')
+            cmd_logger.exception('Failed to create tmp dir for new group', extra=self.log_extra)
             raise
 
-        logger.info('Adding group files')
+        cmd_logger.info('Adding group files', extra=self.log_extra)
         for filename, body in self.params['files'].iteritems():
-            logger.info('Adding file {}'.format(filename))
+            cmd_logger.info('Adding file {}'.format(filename), extra=self.log_extra)
             filename = os.path.join(
                 tmp_dir,
                 filename
@@ -55,14 +55,15 @@ class CreateGroupCommand(BaseCommand):
                 f.write(body)
 
         dest_dir = os.path.join(group_base_path_root_dir, basename)
-        logger.info(
+        cmd_logger.info(
             'Renaming tmp dir {tmp_dir} to destination dir {dest_dir}'.format(
                 tmp_dir=tmp_dir,
                 dest_dir=dest_dir,
-            )
+            ),
+            extra=self.log_extra,
         )
         try:
             os.rename(tmp_dir, dest_dir)
         except Exception:
-            logger.exception('Failed to rename tmp dir to dest dir')
+            cmd_logger.exception('Failed to rename tmp dir to dest dir', extra=self.log_extra)
             raise

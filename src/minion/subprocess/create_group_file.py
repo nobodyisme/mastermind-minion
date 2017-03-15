@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -22,6 +22,6 @@ class CreateGroupFileCommand(BaseCommand):
             with open(path, 'w') as f:
                 f.write(group)
         except Exception:
-            logger.exception('Failed to create group file')
+            cmd_logger.exception('Failed to create group file', extra=self.log_extra)
             raise
-        logger.info('Successfully created group file {} for group {}'.format(path, group))
+        cmd_logger.info('Successfully created group file {} for group {}'.format(path, group), extra=self.log_extra)

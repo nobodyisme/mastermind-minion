@@ -9,6 +9,7 @@ from minion.app import app
 from minion.config import config
 import minion.helpers as h
 from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.manager import manager
 from minion.templates import loader
 
@@ -145,20 +146,29 @@ class CreateGroupHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def post(self):
+        params = {
+            k: v[0]
+            for k, v in self.request.arguments.iteritems()
+        }
+        log_extra = {
+            'task_id': params.get('task_id'),
+            'job_id': params.get('job_id'),
+        }
         if config['common'].get('base_path') is None:
-            logger.error('base path is not set, create group cannot be performed')
+            cmd_logger.error('base path is not set, create group cannot be performed', extra=log_extra)
             self.set_status(500)
             raise RuntimeError('group creation is not allowed')
         files = {}
         for filename, http_files in self.request.files.iteritems():
             norm_filename = os.path.normpath(filename)
             if norm_filename.startswith('..') or norm_filename.startswith('/'):
-                logger.error(
+                cmd_logger.error(
                     'Cannot create file {filename}, '
                     'normalized path {norm_filename} is not allowed'.format(
                         filename=filename,
                         norm_filename=norm_filename,
-                    )
+                    ),
+                    extra=log_extra,
                 )
                 self.set_status(403)
                 raise RuntimeError(
@@ -168,10 +178,6 @@ class CreateGroupHandler(AuthenticationRequestHandler):
             http_file = http_files[0]
             files[norm_filename] = http_file.body
 
-        params = {
-            k: v[0]
-            for k, v in self.request.arguments.iteritems()
-        }
         params['group_base_path_root_dir'] = os.path.normpath(params['group_base_path_root_dir'])
         if not params['group_base_path_root_dir'].startswith(config['common']['base_path']):
             self.set_status(403)
@@ -191,14 +197,17 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def post(self):
-        if config['common'].get('base_path') is None:
-            logger.error('base path is not set, remove group cannot be performed')
-            self.set_status(500)
-            raise RuntimeError('group creation is not allowed')
         params = {
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
+        if config['common'].get('base_path') is None:
+            cmd_logger.error('base path is not set, remove group cannot be performed', extra={
+                'task_id': params.get('task_id'),
+                'job_id': params.get('job_id'),
+            })
+            self.set_status(500)
+            raise RuntimeError('group creation is not allowed')
         params['group_base_path'] = os.path.normpath(params['group_base_path'])
         if not params['group_base_path'].startswith(config['common']['base_path']):
             self.set_status(403)

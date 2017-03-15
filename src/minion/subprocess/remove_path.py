@@ -1,6 +1,6 @@
 import shutil
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -13,6 +13,6 @@ class RemovePathCommand(BaseCommand):
         try:
             shutil.rmtree(self.params['remove_path'])
         except Exception:
-            logger.exception('Failed to remove path {}'.format(self.params['remove_path']))
+            cmd_logger.exception('Failed to remove path {}'.format(self.params['remove_path']), extra=self.log_extra)
             raise
-        logger.info('Successfully removed path {}'.format(self.params['remove_path']))
+        cmd_logger.info('Successfully removed path {}'.format(self.params['remove_path']), extra=self.log_extra)

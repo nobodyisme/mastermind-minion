@@ -1,6 +1,6 @@
 import json
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base_shell import BaseSubprocess
 
 
@@ -24,10 +24,10 @@ class DnetRecoverySubprocess(BaseSubprocess):
 
         commands_stats_path = self.params.get('commands_stats_path')
         if not commands_stats_path:
-            logger.info('Commands stats path was not supplied')
+            cmd_logger.info('Commands stats path was not supplied', extra=self.log_extra)
             return {}
 
-        logger.info('Parsing commands stats path: {}'.format(commands_stats_path))
+        cmd_logger.info('Parsing commands stats path: {}'.format(commands_stats_path), extra=self.log_extra)
 
         commands_stats = {}
 
@@ -35,8 +35,9 @@ class DnetRecoverySubprocess(BaseSubprocess):
             with open(commands_stats_path, 'rb') as f:
                 commands_stats = json.load(f).get('commands', {})
         except Exception:
-            logger.exception(
-                'Failed to parse commands stats file {}'.format(commands_stats_path)
+            cmd_logger.exception(
+                'Failed to parse commands stats file {}'.format(commands_stats_path),
+                extra=self.log_extra,
             )
 
         parsed_stats = self._parse_commands_stats(commands_stats)
@@ -53,6 +54,6 @@ class DnetRecoverySubprocess(BaseSubprocess):
             statuses_count.setdefault(status, 0)
             statuses_count[status] += count
 
-        logger.info('Parsed command statuses: {}'.format(op_statuses_count))
+        cmd_logger.info('Parsed command statuses: {}'.format(op_statuses_count), extra=self.log_extra)
 
         return op_statuses_count
