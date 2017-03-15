@@ -15,7 +15,7 @@ class BaseCommand(object):
 
     def __init__(self, uid, params=None, io_loop=IOLoop.instance()):
         self.uid = uid
-        self.params = params
+        self.params = params or {}
         self.io_loop = io_loop
 
         self.error = None
@@ -41,7 +41,8 @@ class BaseCommand(object):
             pid=None,
             command=self.COMMAND,
             start_ts=self.start_ts,
-            task_id=self.params.get('task_id')
+            task_id=self.params.get('task_id'),
+            job_id=self.params.get('job_id'),
         )
 
         s.update_ts = int(time.time())
@@ -80,6 +81,7 @@ class BaseCommand(object):
             'error_output': '',
             'pid': None,
             'task_id': self.params.get('task_id'),
+            'job_id': self.params.get('job_id'),
             'command': self.COMMAND,
             'artifacts': {},
         }

@@ -76,6 +76,7 @@ class BaseSubprocess(BaseCommand):
             command=self.cmd_str,
             start_ts=int(time.time()),
             task_id=self.params.get('task_id'),
+            job_id=self.params.get('job_id'),
         )
 
         s.update_ts = int(time.time())
@@ -113,6 +114,7 @@ class BaseSubprocess(BaseCommand):
             'pid': self.pid,
             'command': self.cmd_str,
             'task_id': self.params.get('task_id'),
+            'job_id': self.params.get('job_id'),
             'artifacts': self.artifacts,
         }
 

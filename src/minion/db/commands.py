@@ -25,6 +25,7 @@ class Command(Base):
     start_ts = Column(Integer, nullable=False)
     finish_ts = Column(Integer)
 
+    job_id = Column(String)
     task_id = Column(String)
     group_id = Column(String)
     node = Column(String)
@@ -60,6 +61,7 @@ class Command(Base):
         return {
             'pid': self.pid,
             'command': self.command,
+            'job_id': self.job_id,
             'task_id': self.task_id,
             'progress': self.progress,
             'exit_code': self.exit_code,
