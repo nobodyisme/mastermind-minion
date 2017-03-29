@@ -1,3 +1,10 @@
+mastermind-minion (1.21) trusty; urgency=medium
+
+  * Improve logs: send part of logs to new minion.command logger
+  * Add job-id field to command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 29 Mar 2017 13:45:29 +0300
+
 mastermind-minion (1.20) trusty; urgency=medium
 
   * Add check_file_system command
