@@ -17,6 +17,8 @@ class ProgressWatcher(object):
         # (required to limit the rate of db dumps when stdout and stderr is updated)
         self.update_ts = int(time.time())
 
+        # log extra extra should be defined before _feed and _feed_error is used
+        self.log_extra = self.command.log_extra
         subprocess.stdout.read_until_close(self._feed,
                                            streaming_callback=self._feed)
         subprocess.stderr.read_until_close(self._feed_error,
@@ -39,8 +41,6 @@ class ProgressWatcher(object):
 
         self.output_closed = False
         self.error_output_closed = False
-
-        self.log_extra = {'task_id': self.command.task_id, 'job_id': self.command.job_id}
 
     def _append_chunk_to_window(self, window, chunk):
         if len(chunk) == 0:
