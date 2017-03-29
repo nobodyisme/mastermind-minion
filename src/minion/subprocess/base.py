@@ -4,7 +4,7 @@ from tornado.ioloop import IOLoop
 
 from minion.db import Session
 import minion.db.commands
-from minion.logger import logger
+from minion.logger import cmd_logger
 
 
 class BaseCommand(object):
@@ -15,12 +15,17 @@ class BaseCommand(object):
 
     def __init__(self, uid, params=None, io_loop=IOLoop.instance()):
         self.uid = uid
-        self.params = params
+        self.params = params or {}
         self.io_loop = io_loop
 
         self.error = None
         self.start_ts = None
         self.finish_ts = None
+
+        self.log_extra = {
+            'task_id': self.params.get('task_id'),
+            'job_id': self.params.get('job_id'),
+        }
 
         for param_name in self.REQUIRED_PARAMS:
             if param_name not in params:
@@ -41,7 +46,8 @@ class BaseCommand(object):
             pid=None,
             command=self.COMMAND,
             start_ts=self.start_ts,
-            task_id=self.params.get('task_id')
+            task_id=self.params.get('task_id'),
+            job_id=self.params.get('job_id'),
         )
 
         s.update_ts = int(time.time())
@@ -51,7 +57,7 @@ class BaseCommand(object):
         try:
             self.execute()
         except Exception as e:
-            logger.exception('Command execution failed')
+            cmd_logger.exception('Command execution failed', extra=self.log_extra)
             self.error = e
 
         self.finish_ts = int(time.time())
@@ -65,7 +71,7 @@ class BaseCommand(object):
             s.add(command)
             s.commit()
         except Exception as e:
-            logger.exception('Failed to update db command')
+            cmd_logger.exception('Failed to update db command', extra=self.log_extra)
             s.rollback()
 
     def status(self):
@@ -80,6 +86,7 @@ class BaseCommand(object):
             'error_output': '',
             'pid': None,
             'task_id': self.params.get('task_id'),
+            'job_id': self.params.get('job_id'),
             'command': self.COMMAND,
             'artifacts': {},
         }

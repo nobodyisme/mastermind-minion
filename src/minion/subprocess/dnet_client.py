@@ -3,7 +3,7 @@ import re
 import shlex
 
 from minion.config import EllipticsConfig
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base_shell import BaseSubprocess
 from minion.subprocess.create_file_marker import CreateFileMarkerCommand
 from minion.subprocess.remove_group_file import RemoveGroupFileCommand
@@ -45,13 +45,14 @@ class DnetClientSubprocess(BaseSubprocess):
                 if 'group' not in self.params:
                     raise ValueError('Parameter "group" is required')
                 config_path = self.params['config_path']
-                logger.info(
+                cmd_logger.info(
                     'backend id not found in request params, '
                     'getting backend id from elliptics config {config}, '
                     'group {group}'.format(
                         config=config_path,
                         group=self.params['group'],
-                    )
+                    ),
+                    extra=self.log_extra,
                 )
                 config = EllipticsConfig(self.params['config_path'])
                 self.params['backend_id'] = config.get_group_backend(int(self.params['group']))
@@ -59,7 +60,7 @@ class DnetClientSubprocess(BaseSubprocess):
                 raise ValueError('Cannot process command: unknown parameter "{}"'.format(param))
 
         cmd_str = cmd_str.format(**self.params)
-        logger.info('Prepared command: {}'.format(cmd_str))
+        cmd_logger.info('Prepared command: {}'.format(cmd_str), extra=self.log_extra)
         return shlex.split(cmd_str)
 
     def _parse_command_code(self):
@@ -70,27 +71,35 @@ class DnetClientSubprocess(BaseSubprocess):
         try:
             data = json.loads(output)
         except Exception:
-            logger.error('pid {}: failed to parse output json: {}'.format(
-                self.pid,
-                output
-            ))
+            cmd_logger.error(
+                'pid {}: failed to parse output json: {}'.format(
+                    self.pid,
+                    output,
+                ),
+                extra=self.log_extra,
+            )
             return self.watcher.exit_code
 
         if 'error' not in data:
-            logger.error('pid {}: no "error" key in response data'.format(
-                self.pid
-            ))
+            cmd_logger.error(
+                'pid {}: no "error" key in response data'.format(self.pid),
+                extra=self.log_extra,
+            )
             return self.watcher.exit_code
         if 'code' not in data['error']:
-            logger.error('pid {}: no "code" key in response error data'.format(
-                self.pid
-            ))
+            cmd_logger.error(
+                'pid {}: no "code" key in response error data'.format(self.pid),
+                extra=self.log_extra,
+            )
             return self.watcher.exit_code
 
-        logger.info('pid {}: operation error code {}'.format(
-            self.pid,
-            data['error']['code']
-        ))
+        cmd_logger.info(
+            'pid {}: operation error code {}'.format(
+                self.pid,
+                data['error']['code'],
+            ),
+            extra=self.log_extra,
+        )
 
         return data['error']['code']
 

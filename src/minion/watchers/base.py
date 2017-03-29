@@ -1,7 +1,7 @@
 import datetime
 import time
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 
 
 class ProgressWatcher(object):
@@ -40,6 +40,8 @@ class ProgressWatcher(object):
         self.output_closed = False
         self.error_output_closed = False
 
+        self.log_extra = {'task_id': self.command.task_id, 'job_id': self.command.job_id}
+
     def _append_chunk_to_window(self, window, chunk):
         if len(chunk) == 0:
             return
@@ -61,11 +63,11 @@ class ProgressWatcher(object):
             return
 
         if self._force_complete_cb_timeout:
-            logger.debug('pid {0}: removing force complete callback'.format(self.subprocess.pid))
+            cmd_logger.debug('pid {0}: removing force complete callback'.format(self.subprocess.pid), extra=self.log_extra)
             self.subprocess.io_loop.remove_timeout(self._force_complete_cb_timeout)
             self._force_complete_cb_timeout = None
 
-        logger.info('pid {0}: command execution is completed'.format(self.subprocess.pid))
+        cmd_logger.info('pid {0}: command execution is completed'.format(self.subprocess.pid), extra=self.log_extra)
 
         self.command.on_command_completed()
 
@@ -76,7 +78,7 @@ class ProgressWatcher(object):
 
     def _feed(self, s):
         self._append_chunk_to_window(self.output, s)
-        logger.debug('pid {}: stdout feed, {} bytes'.format(self.subprocess.pid, len(s)))
+        cmd_logger.debug('pid {}: stdout feed, {} bytes'.format(self.subprocess.pid, len(s)), extra=self.log_extra)
         self.output_size = min(self.OUTPUT_WINDOW_SIZE, self.output_size + len(s))
         self._update_db_dump()
 
@@ -87,7 +89,7 @@ class ProgressWatcher(object):
 
     def _feed_error(self, s):
         self._append_chunk_to_window(self.error_output, s)
-        logger.debug('pid {}: stderr feed, {} bytes'.format(self.subprocess.pid, len(s)))
+        cmd_logger.debug('pid {}: stderr feed, {} bytes'.format(self.subprocess.pid, len(s)), extra=self.log_extra)
         self.error_output_size = min(self.OUTPUT_WINDOW_SIZE, self.error_output_size + len(s))
         self._update_db_dump()
 
@@ -98,16 +100,16 @@ class ProgressWatcher(object):
 
     def _exit_cb(self, code):
         self._exit = True
-        logger.debug('pid {0}: exit callback'.format(self.subprocess.pid))
+        cmd_logger.debug('pid {0}: exit callback'.format(self.subprocess.pid), extra=self.log_extra)
         self.exit_code = code
         self.progress = 1.0
         self.set_command_code()
 
-        logger.info('pid {0}: exit code {1}, command code {2}'.format(
-            self.subprocess.pid, self.exit_code, self.command_code))
+        cmd_logger.info('pid {0}: exit code {1}, command code {2}'.format(
+            self.subprocess.pid, self.exit_code, self.command_code), extra=self.log_extra)
 
         if self._force_complete_cb_timeout is None:
-            logger.debug('pid {0}: setting force complete callback '.format(self.subprocess.pid))
+            cmd_logger.debug('pid {0}: setting force complete callback '.format(self.subprocess.pid), extra=self.log_extra)
             self._force_complete_cb_timeout = self.subprocess.io_loop.add_timeout(
                 datetime.timedelta(seconds=10),
                 self._force_complete,
@@ -116,12 +118,12 @@ class ProgressWatcher(object):
         self._complete_if_ready()
 
     def _force_complete(self):
-        logger.warn('pid {0}: executing force complete callback'.format(
-            self.subprocess.pid))
+        cmd_logger.warn('pid {0}: executing force complete callback'.format(
+            self.subprocess.pid), extra=self.log_extra)
         self._force_complete_cb_timeout = None
 
         if self.exit_code is None:
-            logger.warn('pid {0}: setting exit code to 999'.format(self.subprocess.pid))
+            cmd_logger.warn('pid {0}: setting exit code to 999'.format(self.subprocess.pid), extra=self.log_extra)
             self.exit_code = 999
             self.progress = 1.0
             self.set_command_code()
@@ -133,7 +135,7 @@ class ProgressWatcher(object):
             return
 
         if self._force_complete_cb_timeout is None:
-            logger.debug('pid {0}: setting force complete callback'.format(self.subprocess.pid))
+            cmd_logger.debug('pid {0}: setting force complete callback'.format(self.subprocess.pid), extra=self.log_extra)
             self._force_complete_cb_timeout = self.subprocess.io_loop.add_timeout(
                 datetime.timedelta(seconds=10),
                 self._force_complete,

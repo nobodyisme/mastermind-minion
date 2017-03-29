@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Float, String
 
 from minion.db import Base
 from minion import subprocess
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base_shell import BaseSubprocess
 
 
@@ -25,6 +25,7 @@ class Command(Base):
     start_ts = Column(Integer, nullable=False)
     finish_ts = Column(Integer)
 
+    job_id = Column(String)
     task_id = Column(String)
     group_id = Column(String)
     node = Column(String)
@@ -51,15 +52,19 @@ class Command(Base):
         try:
             artifacts = json.loads(self.artifacts)
         except ValueError as e:
-            logger.error('Dumped command (uid {}) has mailformed "artifacts" field: {}'.format(
-                self.uid,
-                self.artifacts
-            ))
+            cmd_logger.error(
+                'Dumped command (uid {}) has mailformed "artifacts" field: {}'.format(
+                    self.uid,
+                    self.artifacts
+                ),
+                extra={'task_id': self.task_id, 'job_id': self.job_id},
+            )
             pass
 
         return {
             'pid': self.pid,
             'command': self.command,
+            'job_id': self.job_id,
             'task_id': self.task_id,
             'progress': self.progress,
             'exit_code': self.exit_code,

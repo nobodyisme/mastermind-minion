@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -24,15 +24,15 @@ class CreateFileMarkerCommand(BaseCommand):
             with open(path, 'w') as f:
                 f.write(group)
         except Exception as e:
-            logger.error('Failed to create group file marker: {}'.format(e))
+            cmd_logger.error('Failed to create group file marker: {}'.format(e), extra=self.log_extra)
             marker = self.params.get('stop_backend')
             if marker:
                 try:
                     with open(marker, 'w') as f:
                         f.write(path)
                 except Exception as e:
-                    logger.error('Failed to create backend stop file: {}'.format(e))
+                    cmd_logger.error('Failed to create backend stop file: {}'.format(e), extra=self.log_extra)
                     raise
             else:
                 raise
-        logger.info('Successfully created group file marker for group {}'.format(group))
+        cmd_logger.info('Successfully created group file marker for group {}'.format(group), extra=self.log_extra)

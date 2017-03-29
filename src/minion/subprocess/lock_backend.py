@@ -1,4 +1,4 @@
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -12,6 +12,6 @@ class LockBackendCommand(BaseCommand):
         try:
             open(marker, 'w').close()
         except Exception as e:
-            logger.error('Failed to create backend marker: {}'.format(e))
+            cmd_logger.error('Failed to create backend marker: {}'.format(e), extra=self.log_extra)
             raise
-        logger.info('Successfully created backend marker: {}'.format(marker))
+        cmd_logger.info('Successfully created backend marker: {}'.format(marker), extra=self.log_extra)

@@ -1,6 +1,6 @@
 import os
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -15,6 +15,6 @@ class RemoveBackendStopFileCommand(BaseCommand):
         try:
             os.remove(stop_file)
         except Exception as e:
-            logger.error('Failed to remove backend stop marker: {}'.format(e))
+            cmd_logger.error('Failed to remove backend stop marker: {}'.format(e), extra=self.log_extra)
             raise
-        logger.info('Successfully removed backend stop marker: {}'.format(stop_file))
+        cmd_logger.info('Successfully removed backend stop marker: {}'.format(stop_file), extra=self.log_extra)

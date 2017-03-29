@@ -5,6 +5,15 @@ from minion.importer import import_object
 
 
 logger = logging.getLogger('minion')
+# can use job_id and task_id while formatting log message
+# it needs job_id and task_id in extra field
+cmd_logger = logging.getLogger('minion.command')
+# Example of usage:
+# data = {
+#     'job_id': job_id,
+#     'task_id': task_id,
+# }
+# cmd_logger.info('Command failed', extra=data)
 
 
 def setup_logger(log_config):

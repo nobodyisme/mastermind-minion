@@ -11,7 +11,7 @@ from tornado.process import Subprocess
 from minion.config import config
 from minion.db import Session
 import minion.db.commands
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 from minion.watchers.base import ProgressWatcher
 
@@ -76,6 +76,7 @@ class BaseSubprocess(BaseCommand):
             command=self.cmd_str,
             start_ts=int(time.time()),
             task_id=self.params.get('task_id'),
+            job_id=self.params.get('job_id'),
         )
 
         s.update_ts = int(time.time())
@@ -113,6 +114,7 @@ class BaseSubprocess(BaseCommand):
             'pid': self.pid,
             'command': self.cmd_str,
             'task_id': self.params.get('task_id'),
+            'job_id': self.params.get('job_id'),
             'artifacts': self.artifacts,
         }
 
@@ -157,7 +159,7 @@ class BaseSubprocess(BaseCommand):
             s.add(command)
             s.commit()
         except Exception:
-            logger.exception('Failed to update db command')
+            cmd_logger.exception('Failed to update db command', extra=self.log_extra)
             s.rollback()
 
     @property
@@ -168,10 +170,13 @@ class BaseSubprocess(BaseCommand):
         if self.watcher.exit_code == 0:
             return True
 
-        logger.info('Checking success codes: command code {}, success codes {}'.format(
-            self.command_code,
-            self.success_codes,
-        ))
+        cmd_logger.info(
+            'Checking success codes: command code {}, success codes {}'.format(
+                self.command_code,
+                self.success_codes,
+            ),
+            extra=self.log_extra,
+        )
 
         if self.success_codes and self.command_code in self.success_codes:
             return True
@@ -187,7 +192,7 @@ class BaseSubprocess(BaseCommand):
 
         if not self._apply_postprocessors():
             # TODO: add status codes
-            logger.info('Command failed, no post processors will be applied')
+            cmd_logger.info('Command failed, no post processors will be applied', extra=self.log_extra)
             return
 
         for post_processor in self.POST_PROCESSORS:
@@ -197,7 +202,7 @@ class BaseSubprocess(BaseCommand):
             )
             if params_supplied:
                 # TODO: replace by required params? possibly not
-                logger.info('Running post processor {}'.format(post_processor.__name__))
+                cmd_logger.info('Running post processor {}'.format(post_processor.__name__), extra=self.log_extra)
                 uid = uuid.uuid4().hex
                 command = post_processor(uid, params=self.params)
                 try:
@@ -206,9 +211,12 @@ class BaseSubprocess(BaseCommand):
                     # instead of 'run'
                     command.execute()
                 except:
-                    logger.exception('Post processor {} failed, skipped'.format(
-                        post_processor.__name__
-                    ))
+                    cmd_logger.exception(
+                        'Post processor {} failed, skipped'.format(
+                            post_processor.__name__
+                        ),
+                        extra=self.log_extra,
+                    )
                     continue
 
     def __str__(self):

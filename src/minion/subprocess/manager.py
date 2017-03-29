@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from tornado.ioloop import IOLoop
 
 from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.db import Session
 from minion.db.commands import Command
 from minion.subprocess import subprocess_factory
@@ -33,24 +34,27 @@ class SubprocessManager(object):
         s.begin()
         try:
             for c in s.query(Command).filter_by(exit_code=None):
+                log_extra = {'task_id': c.task_id, 'job_id': c.job_id}
                 if not self.pid_exists(c.pid):
                     c.progress = 1.0
                     c.exit_code = 666
                     c.finish_ts = int(time.time())
                     s.add(c)
-                    logger.info(
+                    cmd_logger.info(
                         'Command {}, pid {} is considered broken, will be marked as '
                         'finished'.format(
                             c.uid,
                             c.pid
-                        )
+                        ),
+                        extra=log_extra,
                     )
                 else:
-                    logger.warn(
+                    cmd_logger.warn(
                         'Command {}, pid {} is considered broken, but process is running'.format(
                             c.uid,
                             c.pid
-                        )
+                        ),
+                        extra=log_extra,
                     )
             s.commit()
         except Exception:
@@ -67,11 +71,15 @@ class SubprocessManager(object):
         return Subprocess
 
     def run(self, command, params, env=None, success_codes=None):
-        logger.info('command to execute: {0}'.format(command))
-        logger.info('parameters supplied: {params}, env variables: {env}'.format(
-            params=params,
-            env=env,
-        ))
+        log_extra = {'task_id': params.get('task_id'), 'job_id': params.get('job_id')}
+        cmd_logger.info('command to execute: {0}'.format(command), extra=log_extra)
+        cmd_logger.info(
+            'parameters supplied: {params}, env variables: {env}'.format(
+                params=params,
+                env=env,
+            ),
+            extra=log_extra,
+        )
         if isinstance(command, unicode):
             command = command.encode('utf-8')
         cmd = (shlex.split(command)
@@ -82,12 +90,13 @@ class SubprocessManager(object):
             running_uid = self.try_find_running_subprocess(params['task_id'])
             if running_uid:
                 running_sub = self.subprocesses[running_uid]
-                logger.info(
+                cmd_logger.info(
                     'command execution is not required, process for task {} is already running: '
                     '{}'.format(
                         params['task_id'],
                         running_sub.status()
-                    )
+                    ),
+                    extra=log_extra,
                 )
                 return running_uid
         Subprocess = self.get_subprocess(cmd, params)
@@ -97,7 +106,7 @@ class SubprocessManager(object):
         else:
             sub = Subprocess(uid, params=params)
         sub.run()
-        logger.info('command execution started successfully: {}'.format(sub))
+        cmd_logger.info('command execution started successfully: {}'.format(sub), extra=log_extra)
 
         self.subprocesses[uid] = sub
         return uid
@@ -139,8 +148,10 @@ class SubprocessManager(object):
     def terminate(self, uid):
         if uid not in self.subprocesses:
             raise ValueError('Unknown command uid: {0}'.format(uid))
-        logger.info(
-            'terminating command {}, pid: {}'.format(uid, self.subprocesses[uid].process.pid)
+        sub = self.subprocesses[uid]
+        cmd_logger.info(
+            'terminating command {}, pid: {}'.format(uid, sub.process.pid),
+            extra=sub.log_extra,
         )
 
         # result, error, sub = self.subprocesses[uid].terminate().result()

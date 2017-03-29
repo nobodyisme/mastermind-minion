@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -32,11 +32,12 @@ class RemoveGroupCommand(BaseCommand):
             dst_base_path,
             self.removed_basename(basename)
         )
-        logger.info(
+        cmd_logger.info(
             'Renaming group base dir {tmp_dir} to destination dir {dest_dir}'.format(
                 tmp_dir=group_base_path,
                 dest_dir=remove_path,
-            )
+            ),
+            extra=self.log_extra,
         )
         try:
             os.rename(group_base_path, remove_path)
@@ -51,5 +52,5 @@ class RemoveGroupCommand(BaseCommand):
             else:
                 raise
         except Exception:
-            logger.exception('Failed to rename tmp dir to dest dir')
+            cmd_logger.exception('Failed to rename tmp dir to dest dir', extra=self.log_extra)
             raise

@@ -1,6 +1,6 @@
 import os
 
-from minion.logger import logger
+from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
@@ -14,6 +14,6 @@ class CheckFileSystemCommand(BaseCommand):
         try:
             os.listdir(path)
         except Exception as e:
-            logger.error('Failed to check path: {}'.format(e))
+            cmd_logger.error('Failed to check path: {}'.format(e), extra=self.log_extra)
             raise
-        logger.info('Successfully check path: {}'.format(path))
+        cmd_logger.info('Successfully check path: {}'.format(path), extra=self.log_extra)
