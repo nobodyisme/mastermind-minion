@@ -1,3 +1,9 @@
+mastermind-minion (1.22) trusty; urgency=medium
+
+  * Fix usage of extra variable in logging
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Wed, 29 Mar 2017 14:07:50 +0300
+
 mastermind-minion (1.21) trusty; urgency=medium
 
   * Improve logs: send part of logs to new minion.command logger
