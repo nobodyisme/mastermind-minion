@@ -3,6 +3,7 @@ import shlex
 import time
 import uuid
 
+from sqlalchemy import desc
 from sqlalchemy import or_
 from tornado.ioloop import IOLoop
 
@@ -86,19 +87,18 @@ class SubprocessManager(object):
                if isinstance(command, basestring) else
                command)
 
-        if params.get('task_id'):
-            running_uid = self.try_find_running_subprocess(params['task_id'])
-            if running_uid:
-                running_sub = self.subprocesses[running_uid]
-                cmd_logger.info(
-                    'command execution is not required, process for task {} is already running: '
-                    '{}'.format(
-                        params['task_id'],
-                        running_sub.status()
-                    ),
-                    extra=log_extra,
-                )
-                return running_uid
+        subprocess_uid, status = self.try_find_nonfailed_subprocess_and_status(params.get('task_id'), params.get('job_id'))
+        if subprocess_uid:
+            cmd_logger.info(
+                'command execution is not required, process for task {} is already running: '
+                '{}'.format(
+                    params['task_id'],
+                    status,
+                ),
+                extra=log_extra,
+            )
+            return subprocess_uid
+
         Subprocess = self.get_subprocess(cmd, params)
         uid = uuid.uuid4().hex
         if issubclass(Subprocess, BaseSubprocess):
@@ -176,11 +176,39 @@ class SubprocessManager(object):
                     )
                 )
 
-    def try_find_running_subprocess(self, task_id):
+    def try_find_nonfailed_subprocess_and_status(self, job_id, task_id):
+        if not task_id:
+            return None, None
+
         for uid, subprocess in self.subprocesses.iteritems():
             status = subprocess.status()
-            if status.get('task_id', None) == task_id and (status['exit_code'] == 0 or status['progress'] < 1.0):
-                return uid
+            # it is enough to check only task_id and ignore job_id
+            if status.get('task_id') == task_id and (status['exit_code'] == 0 or status['progress'] < 1.0):
+                return uid, status
+
+        s = Session()
+        # it is enough to check only task_id and ignore job_id
+        command = s.query(Command).filter(Command.task_id == task_id).order_by(desc(Command.start_ts)).first()
+        if not command:
+            return None, None
+
+        if command.progress != 1.0:
+            cmd_logger.warning(
+                "Command {} ({}) was interrupted by minion restart, but not marked as finished".format(
+                    command.uid,
+                    command.command,
+                ),
+                extra={
+                    'job_id': job_id,
+                    'task_id': task_id,
+                },
+            )
+            return None, None
+
+        if command.exit_code == 0:
+            return command.uid, command.status
+
+        return None, None
 
 
 manager = SubprocessManager()
