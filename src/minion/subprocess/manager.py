@@ -106,7 +106,10 @@ class SubprocessManager(object):
         else:
             sub = Subprocess(uid, params=params)
         sub.run()
-        cmd_logger.info('command execution started successfully: {}'.format(sub), extra=log_extra)
+        if sub.error:
+            cmd_logger.info('command execution failed: {}: {}'.format(sub, sub.error), extra=log_extra)
+        else:
+            cmd_logger.info('command execution started successfully: {}'.format(sub), extra=log_extra)
 
         self.subprocesses[uid] = sub
         return uid
