@@ -1,3 +1,9 @@
+mastermind-minion (1.23) trusty; urgency=medium
+
+  * Prevent repeated run of command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Thu, 31 Aug 2017 14:27:07 +0300
+
 mastermind-minion (1.22) trusty; urgency=medium
 
   * Fix usage of extra variable in logging
