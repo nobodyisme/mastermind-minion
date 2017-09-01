@@ -1,3 +1,9 @@
+mastermind-minion (1.24) trusty; urgency=medium
+
+  * Fix misprint in order of arguments
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 01 Sep 2017 18:01:20 +0300
+
 mastermind-minion (1.23) trusty; urgency=medium
 
   * Prevent repeated run of command
