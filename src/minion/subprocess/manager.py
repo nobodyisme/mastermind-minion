@@ -87,7 +87,7 @@ class SubprocessManager(object):
                if isinstance(command, basestring) else
                command)
 
-        subprocess_uid, status = self.try_find_nonfailed_subprocess_and_status(params.get('task_id'), params.get('job_id'))
+        subprocess_uid, status = self.try_find_nonfailed_subprocess_and_status(params.get('job_id'), params.get('task_id'))
         if subprocess_uid:
             cmd_logger.info(
                 'command execution is not required, process for task {} is already running: '
