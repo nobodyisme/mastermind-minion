@@ -1,3 +1,4 @@
+import json
 import time
 
 from tornado.ioloop import IOLoop
@@ -21,6 +22,8 @@ class BaseCommand(object):
         self.error = None
         self.start_ts = None
         self.finish_ts = None
+
+        self.artifacts = {}
 
         self.log_extra = {
             'task_id': self.params.get('task_id'),
@@ -68,6 +71,7 @@ class BaseCommand(object):
             command.exit_code = 1 if self.error else 0
             command.command_code = 1 if self.error else 0
             command.finish_ts = self.finish_ts
+            command.artifacts = json.dumps(self.artifacts)
             s.add(command)
             s.commit()
         except Exception as e:
@@ -88,7 +92,7 @@ class BaseCommand(object):
             'task_id': self.params.get('task_id'),
             'job_id': self.params.get('job_id'),
             'command': self.COMMAND,
-            'artifacts': {},
+            'artifacts': self.artifacts,
         }
 
     def __str__(self):
