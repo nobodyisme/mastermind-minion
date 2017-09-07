@@ -67,3 +67,8 @@ class CreateGroupCommand(BaseCommand):
         except Exception:
             cmd_logger.exception('Failed to rename tmp dir to dest dir', extra=self.log_extra)
             raise
+
+        backend_path = dest_dir
+        if not backend_path.endswith('/'):
+            backend_path += '/'
+        self.artifacts['backend_path'] = backend_path
