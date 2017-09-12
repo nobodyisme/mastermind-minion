@@ -1,3 +1,9 @@
+mastermind-minion (1.26) trusty; urgency=medium
+
+  * Add lrc_list command
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Tue, 12 Sep 2017 18:04:48 +0300
+
 mastermind-minion (1.25) trusty; urgency=medium
 
   * Add backend path artifacts to create group command
