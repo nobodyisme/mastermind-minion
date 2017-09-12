@@ -6,7 +6,7 @@ from minion.subprocess.create_ids_file import CreateIdsFileCommand
 from minion.subprocess.dnet_recovery import DnetRecoverySubprocess
 from minion.subprocess.ubic import UbicSubprocess
 from minion.subprocess.dnet_client import DnetClientSubprocess
-from minion.subprocess.lrc_convert import LrcListSubprocess
+from minion.subprocess.lrc_list import LrcListSubprocess
 from minion.subprocess.lrc_convert import LrcConvertSubprocess
 from minion.subprocess.lrc_validate import LrcValidateSubprocess
 from minion.subprocess.mds_cleanup import MdsCleanupSubprocess
