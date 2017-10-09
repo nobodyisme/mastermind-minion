@@ -1,3 +1,5 @@
+import os
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -15,6 +17,10 @@ class LockBackendCommand(BaseCommand):
         marker = self.params['mark_backend']
 
         try:
+            dirname = os.path.dirname(marker)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname, 0755)
+
             with open(marker, 'w') as f:
                 f.write(holder_id)
 
