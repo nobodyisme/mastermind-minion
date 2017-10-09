@@ -5,6 +5,8 @@ from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
 
+# NB: there is LockBackendCommand, which is used to write holder id
+# and usually write holder id is better than group id
 class CreateFileMarkerCommand(BaseCommand):
 
     COMMAND = 'create_file_marker'

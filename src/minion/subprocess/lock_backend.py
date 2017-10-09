@@ -26,5 +26,12 @@ class LockBackendCommand(BaseCommand):
 
         except Exception as e:
             cmd_logger.error('Failed to create backend marker: {}'.format(e), extra=self.log_extra)
-            raise
+            # stop_marker_on_errors option is used in tasks to restore group
+            # if node backend is broken and currently in RO state, we cannot create lock file,
+            # so we can only skip exception.
+            if self.params.get('skip_errors'):
+                pass
+            else:
+                raise
+
         cmd_logger.info('Successfully created backend marker: {}'.format(marker), extra=self.log_extra)
