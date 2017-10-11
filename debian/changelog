@@ -1,3 +1,12 @@
+mastermind-minion (1.28) trusty; urgency=medium
+
+  * Allow to skip errors
+  * Create folder for locks if nessesary
+  * Allow to write holder id to locks
+  * Add lrc_remove command
+
+ -- Evgenii Gorinov <jonny-k@yandex-team.ru>  Wed, 11 Oct 2017 16:21:33 +0300
+
 mastermind-minion (1.27) trusty; urgency=medium
 
   * Add lrc_list command
