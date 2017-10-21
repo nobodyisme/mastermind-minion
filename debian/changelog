@@ -1,3 +1,9 @@
+mastermind-minion (1.30) trusty; urgency=medium
+
+  * Add artifacts to dnet_client commands
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Sat, 21 Oct 2017 21:52:46 +0300
+
 mastermind-minion (1.29) trusty; urgency=medium
 
   * Allow to skip errors
