@@ -2,6 +2,7 @@ import json
 import re
 import shlex
 
+from minion.artifacts.dnet_client import DnetClientArtifactsMixin
 from minion.config import EllipticsConfig
 from minion.logger import cmd_logger
 from minion.subprocess.base_shell import BaseSubprocess
@@ -12,7 +13,7 @@ from minion.subprocess.lock_backend import LockBackendCommand
 from minion.subprocess.unlock_backend import UnlockBackendCommand
 
 
-class DnetClientSubprocess(BaseSubprocess):
+class DnetClientSubprocess(DnetClientArtifactsMixin, BaseSubprocess):
 
     COMMAND = 'dnet_client'
     POST_PROCESSORS = (
