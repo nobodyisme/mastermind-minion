@@ -41,8 +41,8 @@ class RsyncWatcher(ProgressWatcher):
 
         self.buf = ''
 
-    def feed(self, s):
-        super(RsyncWatcher, self).feed(s)
+    def _feed(self, s):
+        super(RsyncWatcher, self)._feed(s)
         if self._exit:
             return
         data = self.SPLIT_RE.split(s)
