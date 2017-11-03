@@ -1,3 +1,9 @@
+mastermind-minion (1.32) trusty; urgency=medium
+
+  * Add task_id index and add debug log around slow query
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Fri, 03 Nov 2017 20:19:31 +0300
+
 mastermind-minion (1.31) trusty; urgency=medium
 
   * Fix parsing of rsync command output
