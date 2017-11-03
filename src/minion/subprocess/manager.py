@@ -191,7 +191,9 @@ class SubprocessManager(object):
 
         s = Session()
         # it is enough to check only task_id and ignore job_id
+        query_start_ts = time.time()
         command = s.query(Command).filter(Command.task_id == task_id).order_by(desc(Command.start_ts)).first()
+        logger.debug('find_nonfailed_subprocess query completed in {:.3f} seconds'.format(time.time() - query_start_ts))
         if not command:
             return None, None
 
