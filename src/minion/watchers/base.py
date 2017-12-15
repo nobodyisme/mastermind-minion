@@ -128,7 +128,7 @@ class ProgressWatcher(object):
             self.progress = 1.0
             self.set_command_code()
 
-        self.on_command_completed()
+        self.command.on_command_completed()
 
     def _ensure_exit_cb(self):
         if self._exit:
