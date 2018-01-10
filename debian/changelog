@@ -1,3 +1,10 @@
+mastermind-minion (1.33) trusty; urgency=medium
+
+  * Correctly complete command execution when stdout and stderr are
+    exhausted
+
+ -- Evgenii Gorinov <jonny-k@yandex-team.ru>  Wed, 10 Jan 2018 13:18:47 +0300
+
 mastermind-minion (1.32) trusty; urgency=medium
 
   * Add task_id index and add debug log around slow query
