@@ -1,3 +1,9 @@
+mastermind-minion (1.34) trusty; urgency=medium
+
+  * Account unavailable_groups to artifacts of recovery job
+
+ -- Evgenii Gorinov <jonny-k@yandex-team.ru>  Tue, 13 Feb 2018 15:09:37 +0300
+
 mastermind-minion (1.33) trusty; urgency=medium
 
   * Correctly complete command execution when stdout and stderr are
