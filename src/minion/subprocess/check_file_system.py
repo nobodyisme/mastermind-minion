@@ -1,5 +1,7 @@
 import os
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -9,6 +11,7 @@ class CheckFileSystemCommand(BaseCommand):
     COMMAND = 'check_file_system'
     REQUIRED_PARAMS = ('backend_path',)
 
+    @gen.coroutine
     def execute(self):
         path = self.params['backend_path']
         try:

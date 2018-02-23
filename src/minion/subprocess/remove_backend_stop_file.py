@@ -1,5 +1,7 @@
 import os
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -10,6 +12,7 @@ class RemoveBackendStopFileCommand(BaseCommand):
     # TODO: rename to stop_file
     REQUIRED_PARAMS = ('remove_stop_file',)
 
+    @gen.coroutine
     def execute(self):
         stop_file = self.params['remove_stop_file']
         try:

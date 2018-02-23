@@ -1,6 +1,8 @@
 import os
 import os.path
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -10,6 +12,7 @@ class CreateIdsFileCommand(BaseCommand):
     COMMAND = 'create_ids_file'
     REQUIRED_PARAMS = ('ids',)
 
+    @gen.coroutine
     def execute(self):
         ids_file = self.params['ids']
         cmd_logger.info('Generating ids file {}'.format(ids_file), extra=self.log_extra)

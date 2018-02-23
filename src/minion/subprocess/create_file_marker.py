@@ -1,6 +1,8 @@
 import os
 import os.path
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -12,6 +14,7 @@ class CreateFileMarkerCommand(BaseCommand):
     COMMAND = 'create_file_marker'
     REQUIRED_PARAMS = ('group_file_marker',)
 
+    @gen.coroutine
     def execute(self):
         group_str = str(self.params.get('group', ''))
         path = self.params['group_file_marker'].format(group_id=group_str)

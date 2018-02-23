@@ -1,6 +1,8 @@
 import os
 import os.path
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -27,6 +29,7 @@ class CreateGroupCommand(BaseCommand):
             break
         return str(free_basename)
 
+    @gen.coroutine
     def execute(self):
         group_base_path_root_dir = self.params['group_base_path_root_dir'].rstrip('/')
 

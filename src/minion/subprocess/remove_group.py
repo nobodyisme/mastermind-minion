@@ -1,6 +1,8 @@
 import os
 import os.path
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -16,6 +18,7 @@ class RemoveGroupCommand(BaseCommand):
             group=self.params['group'],
         )
 
+    @gen.coroutine
     def execute(self):
         group_base_path = self.params['group_base_path'].rstrip('/')
 

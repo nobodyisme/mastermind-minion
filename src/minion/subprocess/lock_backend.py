@@ -1,5 +1,7 @@
 import os
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -12,6 +14,7 @@ class LockBackendCommand(BaseCommand):
         # 'holder_id',  # temporary not required, uncomment this param later
     )
 
+    @gen.coroutine
     def execute(self):
         holder_id = self.params.get('holder_id', '')
         marker = self.params['mark_backend']

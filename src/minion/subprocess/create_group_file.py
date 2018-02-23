@@ -1,6 +1,8 @@
 import os
 import os.path
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -10,6 +12,7 @@ class CreateGroupFileCommand(BaseCommand):
     COMMAND = 'create_group_file'
     REQUIRED_PARAMS = ('group', 'group_file',)
 
+    @gen.coroutine
     def execute(self):
         group = str(int(self.params['group']))
         path = self.params['group_file'].format(group_id=group)

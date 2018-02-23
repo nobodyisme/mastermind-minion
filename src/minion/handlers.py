@@ -87,7 +87,7 @@ class RsyncStartHandler(AuthenticationRequestHandler):
             if header.upper().startswith('ENV_'):
                 env_var_name = header.upper()[len('ENV_'):]
                 env[env_var_name] = value
-        uid = manager.run(cmd, params, env=env, success_codes=success_codes)
+        uid = yield manager.run(cmd, params, env=env, success_codes=success_codes)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -124,7 +124,7 @@ class NodeShutdownHandler(AuthenticationRequestHandler):
     def post(self):
         cmd = self.get_argument('command')
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
-        uid = manager.run(cmd, params)
+        uid = yield manager.run(cmd, params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -192,7 +192,7 @@ class CreateGroupHandler(AuthenticationRequestHandler):
                 )
             )
         params['files'] = files
-        uid = manager.run('create_group', params=params)
+        uid = yield manager.run('create_group', params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -221,7 +221,7 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
                     path=params['group_base_path'],
                 )
             )
-        uid = manager.run('remove_group', params=params)
+        uid = yield manager.run('remove_group', params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -235,6 +235,6 @@ class CmdHandler(AuthenticationRequestHandler):
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
-        uid = manager.run(cmd, params=params)
+        uid = yield manager.run(cmd, params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))

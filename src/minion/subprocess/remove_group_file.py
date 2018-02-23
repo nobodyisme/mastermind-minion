@@ -1,5 +1,7 @@
 import os
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -9,6 +11,7 @@ class RemoveGroupFileCommand(BaseCommand):
     COMMAND = 'remove_group_file'
     REQUIRED_PARAMS = ('remove_group_file',)
 
+    @gen.coroutine
     def execute(self):
         cmd_logger.info('Removing group file {0}'.format(self.params['remove_group_file']), extra=self.log_extra)
         path = self.params['remove_group_file']

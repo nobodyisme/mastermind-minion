@@ -1,3 +1,5 @@
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -8,6 +10,7 @@ class CreateBackendStopFileCommand(BaseCommand):
     # TODO: rename to stop_file
     REQUIRED_PARAMS = ('create_stop_file',)
 
+    @gen.coroutine
     def execute(self):
         stop_file = self.params['create_stop_file']
         try:

@@ -1,6 +1,7 @@
 import json
 import time
 
+from tornado import gen
 from tornado.ioloop import IOLoop
 
 from minion.db import Session
@@ -34,9 +35,11 @@ class BaseCommand(object):
             if param_name not in params:
                 raise ValueError('Parameter "{}" is required'.format(param_name))
 
+    @gen.coroutine
     def execute(self):
         raise NotImplemented("Command should implement 'execute' method")
 
+    @gen.coroutine
     def run(self):
 
         self.start_ts = int(time.time())
@@ -58,7 +61,7 @@ class BaseCommand(object):
         s.commit()
 
         try:
-            self.execute()
+            yield self.execute()
         except Exception as e:
             cmd_logger.exception('Command execution failed', extra=self.log_extra)
             self.error = e
