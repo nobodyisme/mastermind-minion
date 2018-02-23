@@ -3,6 +3,7 @@ import json
 import os.path
 import traceback
 
+from tornado import gen
 import tornado.web
 
 from minion.app import app
@@ -29,22 +30,26 @@ class AuthenticationRequestHandler(tornado.web.RequestHandler):
 
     @staticmethod
     def auth_required(method):
+        @gen.coroutine
         @wraps(method)
         def wrapped(self, *args, **kwargs):
             if not self.is_authenticated():
                 self.set_status(403)
                 return
-            return method(self, *args, **kwargs)
+            res = yield method(self, *args, **kwargs)
+            raise gen.Return(res)
         return wrapped
 
 
 def api_response(method):
+
+    @gen.coroutine
     @wraps(method)
     def wrapped(self, *args, **kwargs):
         try:
             self.add_header('Content-Type', 'text/json')
             try:
-                res = method(self, *args, **kwargs)
+                res = yield gen.coroutine(method)(self, *args, **kwargs)
             except Exception as e:
                 logger.error('{0}: {1}'.format(e, traceback.format_exc(e)))
                 response = {'status': 'error',
@@ -100,7 +105,7 @@ class CommandTerminateHandler(AuthenticationRequestHandler):
     def post(self):
         uid = self.get_argument('cmd_uid')
         manager.terminate(uid)
-        return {uid: manager.status(uid)}
+        raise gen.Return({uid: manager.status(uid)})
 
 
 @h.route(app, r'/command/status/([0-9a-f]+)/', name='status')
@@ -109,7 +114,7 @@ class RsyncStatusHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def get(self, uid):
-        return {uid: manager.status(uid)}
+        raise gen.Return({uid: manager.status(uid)})
 
 
 @h.route(app, r'/node/shutdown/', name='node_shutdown')
@@ -138,7 +143,7 @@ class RsyncListHandler(AuthenticationRequestHandler):
             del command['output']
             del command['error_output']
 
-        return result
+        raise gen.Return(result)
 
 
 @h.route(app, r'/command/create_group/')
