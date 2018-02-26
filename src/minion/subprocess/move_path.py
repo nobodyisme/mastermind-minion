@@ -1,5 +1,7 @@
 import os
 
+from tornado import gen
+
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
 
@@ -9,6 +11,7 @@ class MovePathCommand(BaseCommand):
     COMMAND = 'move_path'
     REQUIRED_PARAMS = ('move_src', 'move_dst')
 
+    @gen.coroutine
     def execute(self):
         try:
             os.rename(self.params['move_src'], self.params['move_dst'])

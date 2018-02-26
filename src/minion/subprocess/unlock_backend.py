@@ -1,8 +1,10 @@
+import errno
 import os
+
+from tornado import gen
 
 from minion.logger import cmd_logger
 from minion.subprocess.base import BaseCommand
-import errno
 
 
 class UnlockBackendCommand(BaseCommand):
@@ -10,6 +12,7 @@ class UnlockBackendCommand(BaseCommand):
     COMMAND = 'unlock_backend'
     REQUIRED_PARAMS = ('unmark_backend',)
 
+    @gen.coroutine
     def execute(self):
         marker = self.params['unmark_backend']
         try:

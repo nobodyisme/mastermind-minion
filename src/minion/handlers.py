@@ -3,6 +3,7 @@ import json
 import os.path
 import traceback
 
+from tornado import gen
 import tornado.web
 
 from minion.app import app
@@ -29,22 +30,26 @@ class AuthenticationRequestHandler(tornado.web.RequestHandler):
 
     @staticmethod
     def auth_required(method):
+        @gen.coroutine
         @wraps(method)
         def wrapped(self, *args, **kwargs):
             if not self.is_authenticated():
                 self.set_status(403)
                 return
-            return method(self, *args, **kwargs)
+            res = yield method(self, *args, **kwargs)
+            raise gen.Return(res)
         return wrapped
 
 
 def api_response(method):
+
+    @gen.coroutine
     @wraps(method)
     def wrapped(self, *args, **kwargs):
         try:
             self.add_header('Content-Type', 'text/json')
             try:
-                res = method(self, *args, **kwargs)
+                res = yield gen.coroutine(method)(self, *args, **kwargs)
             except Exception as e:
                 logger.error('{0}: {1}'.format(e, traceback.format_exc(e)))
                 response = {'status': 'error',
@@ -82,7 +87,7 @@ class RsyncStartHandler(AuthenticationRequestHandler):
             if header.upper().startswith('ENV_'):
                 env_var_name = header.upper()[len('ENV_'):]
                 env[env_var_name] = value
-        uid = manager.run(cmd, params, env=env, success_codes=success_codes)
+        uid = yield manager.run(cmd, params, env=env, success_codes=success_codes)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -100,7 +105,7 @@ class CommandTerminateHandler(AuthenticationRequestHandler):
     def post(self):
         uid = self.get_argument('cmd_uid')
         manager.terminate(uid)
-        return {uid: manager.status(uid)}
+        raise gen.Return({uid: manager.status(uid)})
 
 
 @h.route(app, r'/command/status/([0-9a-f]+)/', name='status')
@@ -109,7 +114,7 @@ class RsyncStatusHandler(AuthenticationRequestHandler):
     @AuthenticationRequestHandler.auth_required
     @api_response
     def get(self, uid):
-        return {uid: manager.status(uid)}
+        raise gen.Return({uid: manager.status(uid)})
 
 
 @h.route(app, r'/node/shutdown/', name='node_shutdown')
@@ -119,7 +124,7 @@ class NodeShutdownHandler(AuthenticationRequestHandler):
     def post(self):
         cmd = self.get_argument('command')
         params = dict((k, v[0]) for k, v in self.request.arguments.iteritems())
-        uid = manager.run(cmd, params)
+        uid = yield manager.run(cmd, params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -138,7 +143,7 @@ class RsyncListHandler(AuthenticationRequestHandler):
             del command['output']
             del command['error_output']
 
-        return result
+        raise gen.Return(result)
 
 
 @h.route(app, r'/command/create_group/')
@@ -187,7 +192,7 @@ class CreateGroupHandler(AuthenticationRequestHandler):
                 )
             )
         params['files'] = files
-        uid = manager.run('create_group', params=params)
+        uid = yield manager.run('create_group', params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -216,7 +221,7 @@ class RemoveGroupHandler(AuthenticationRequestHandler):
                     path=params['group_base_path'],
                 )
             )
-        uid = manager.run('remove_group', params=params)
+        uid = yield manager.run('remove_group', params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))
 
@@ -230,6 +235,6 @@ class CmdHandler(AuthenticationRequestHandler):
             k: v[0]
             for k, v in self.request.arguments.iteritems()
         }
-        uid = manager.run(cmd, params=params)
+        uid = yield manager.run(cmd, params=params)
         self.set_status(302)
         self.add_header('Location', self.reverse_url('status', uid))

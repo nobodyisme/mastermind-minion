@@ -20,6 +20,8 @@ from minion.subprocess.create_file_marker import CreateFileMarkerCommand
 from minion.subprocess.unlock_backend import UnlockBackendCommand
 from minion.subprocess.remove_group_file import RemoveGroupFileCommand
 from minion.subprocess.check_file_system import CheckFileSystemCommand
+from minion.subprocess.ping import PingCommand
+from minion.subprocess.check_group_location import CheckGroupLocation
 
 __all__ = (
     RsyncSubprocess,
@@ -44,6 +46,8 @@ __all__ = (
     UnlockBackendCommand,
     RemoveGroupFileCommand,
     CheckFileSystemCommand,
+    PingCommand,
+    CheckGroupLocation,
 )
 
 

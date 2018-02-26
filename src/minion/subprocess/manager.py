@@ -5,6 +5,7 @@ import uuid
 
 from sqlalchemy import desc
 from sqlalchemy import or_
+from tornado import gen
 from tornado.ioloop import IOLoop
 
 from minion.logger import logger
@@ -71,6 +72,7 @@ class SubprocessManager(object):
             self.check_node_backend(params['node_backend'])
         return Subprocess
 
+    @gen.coroutine
     def run(self, command, params, env=None, success_codes=None):
         log_extra = {'task_id': params.get('task_id'), 'job_id': params.get('job_id')}
         cmd_logger.info('command to execute: {0}'.format(command), extra=log_extra)
@@ -97,7 +99,7 @@ class SubprocessManager(object):
                 ),
                 extra=log_extra,
             )
-            return subprocess_uid
+            raise gen.Return(subprocess_uid)
 
         Subprocess = self.get_subprocess(cmd, params)
         uid = uuid.uuid4().hex
@@ -105,14 +107,14 @@ class SubprocessManager(object):
             sub = Subprocess(uid, cmd, params=params, env=env, success_codes=success_codes)
         else:
             sub = Subprocess(uid, params=params)
-        sub.run()
+        yield sub.run()
         if sub.error:
             cmd_logger.info('command execution failed: {}: {}'.format(sub, sub.error), extra=log_extra)
         else:
             cmd_logger.info('command execution started successfully: {}'.format(sub), extra=log_extra)
 
         self.subprocesses[uid] = sub
-        return uid
+        raise gen.Return(uid)
 
     def status(self, uid):
         if uid in self.subprocesses:

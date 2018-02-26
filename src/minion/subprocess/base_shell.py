@@ -5,6 +5,7 @@ import shlex
 import time
 import uuid
 
+from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 
@@ -57,6 +58,7 @@ class BaseSubprocess(BaseCommand):
             if not env_var_name.startswith('__')
         )
 
+    @gen.coroutine
     def run(self):
 
         self.start_ts = int(time.time())
