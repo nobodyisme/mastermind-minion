@@ -32,49 +32,29 @@ class RemoveGroupCommand(BaseCommand):
 
         dst_base_path, basename = os.path.split(group_base_path)
 
-        delete_backend_dir = self.params.get('delete_backend_dir', False)
-
-        if delete_backend_dir:
-
-            try:
-                shutil.rmtree(group_base_path)
-            except OSError as e:
-                if e.errno == 2:
-                    # errno == 2: No such file or directory
+        remove_path = os.path.join(
+            dst_base_path,
+            self.removed_basename(basename)
+        )
+        cmd_logger.info(
+            'Renaming group base dir {tmp_dir} to destination dir {dest_dir}'.format(
+                tmp_dir=group_base_path,
+                dest_dir=remove_path,
+            ),
+            extra=self.log_extra,
+        )
+        try:
+            os.rename(group_base_path, remove_path)
+        except OSError as e:
+            if e.errno == 2:
+                # errno == 2: No such file or directory
+                if os.path.exists(remove_path):
+                    # group_base_path was already renamed, not an error
                     pass
                 else:
                     raise
-            except Exception:
-                cmd_logger.exception(
-                    'Failed to remove backend directory {}'.format(self.params['group_base_path']),
-                    extra=self.log_extra,
-                )
+            else:
                 raise
-
-        else:
-            remove_path = os.path.join(
-                dst_base_path,
-                self.removed_basename(basename)
-            )
-            cmd_logger.info(
-                'Renaming group base dir {tmp_dir} to destination dir {dest_dir}'.format(
-                    tmp_dir=group_base_path,
-                    dest_dir=remove_path,
-                ),
-                extra=self.log_extra,
-            )
-            try:
-                os.rename(group_base_path, remove_path)
-            except OSError as e:
-                if e.errno == 2:
-                    # errno == 2: No such file or directory
-                    if os.path.exists(remove_path):
-                        # group_base_path was already renamed, not an error
-                        pass
-                    else:
-                        raise
-                else:
-                    raise
-            except Exception:
-                cmd_logger.exception('Failed to rename tmp dir to dest dir', extra=self.log_extra)
-                raise
+        except Exception:
+            cmd_logger.exception('Failed to rename tmp dir to dest dir', extra=self.log_extra)
+            raise
