@@ -47,7 +47,8 @@ class CheckGroupLocation(BaseCommand):
     @staticmethod
     def _check_group_file(group_file, group):
         try:
-            group_file_content = open(group_file).read()
+            with open(group_file) as f:
+                group_file_content = f.read()
         except Exception as e:
             raise RuntimeError(
                 'Failed to read contents of group id file {}: {}'.format(group_file, e)
