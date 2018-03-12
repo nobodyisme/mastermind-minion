@@ -1,3 +1,10 @@
+mastermind-minion (1.37) trusty; urgency=medium
+
+  * Add monitor port request timeout configuration
+  * Close file explicitly
+
+ -- Andrey Vasilenkov <indigo@yandex-team.ru>  Mon, 12 Mar 2018 16:50:20 +0300
+
 mastermind-minion (1.36) trusty; urgency=medium
 
   * Disable backend dir removal
