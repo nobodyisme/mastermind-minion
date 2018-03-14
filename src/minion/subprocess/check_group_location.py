@@ -77,8 +77,8 @@ class CheckGroupLocation(BaseCommand):
                 backends=backend_id,
             ),
             allow_ipv6=True,
-            connect_timeout=config['elliptics']['monitor_port_connect_timeout'],
-            request_timeout=config['elliptics']['monitor_port_request_timeout'],
+            connect_timeout=float(config['elliptics']['monitor_port_connect_timeout']),
+            request_timeout=float(config['elliptics']['monitor_port_request_timeout']),
         )
         response = yield http_client.fetch(request, raise_error=False)
         if response.error:
