@@ -8,6 +8,7 @@ from minion.subprocess.ubic import UbicSubprocess
 from minion.subprocess.dnet_client import DnetClientSubprocess
 from minion.subprocess.lrc_list import LrcListSubprocess
 from minion.subprocess.lrc_convert import LrcConvertSubprocess
+from minion.subprocess.lrc_defrag import LrcDefragSubprocess
 from minion.subprocess.lrc_validate import LrcValidateSubprocess
 from minion.subprocess.mds_cleanup import MdsCleanupSubprocess
 from minion.subprocess.create_group import CreateGroupCommand
@@ -30,6 +31,7 @@ __all__ = (
     DnetClientSubprocess,
     LrcListSubprocess,
     LrcConvertSubprocess,
+    LrcDefragSubprocess,
     LrcValidateSubprocess,
     MdsCleanupSubprocess,
     LrcRecoverSubprocess,

@@ -99,6 +99,7 @@ class SubprocessManager(object):
                 ),
                 extra=log_extra,
             )
+            # Note: subprocess_uid can be not in self.subprocesses
             raise gen.Return(subprocess_uid)
 
         Subprocess = self.get_subprocess(cmd, params)

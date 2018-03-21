@@ -1,3 +1,10 @@
+mastermind-minion (1.39) trusty; urgency=medium
+
+  * Support lrc defrag command
+  * Polish code
+
+ -- Evgenii Gorinov <jonny-k@yandex-team.ru>  Wed, 21 Mar 2018 20:54:50 +0300
+
 mastermind-minion (1.38) trusty; urgency=medium
 
   * Fix misprint
