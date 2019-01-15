@@ -1,3 +1,9 @@
+mastermind-minion (1.40) xenial; urgency=medium
+
+  * Change OUTPUT_WINDOW_SIZE to 4Kb
+
+ -- Evgeny Avramenko <kanst9@yandex-team.ru>  Tue, 15 Jan 2019 15:40:49 +0300
+
 mastermind-minion (1.39) trusty; urgency=medium
 
   * Support lrc defrag command
