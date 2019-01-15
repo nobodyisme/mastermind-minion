@@ -6,7 +6,7 @@ from minion.logger import cmd_logger
 
 class ProgressWatcher(object):
 
-    OUTPUT_WINDOW_SIZE = 1024 ** 2  # 1Mb
+    OUTPUT_WINDOW_SIZE = 1024 * 4 # 4Kb
     OUTPUT_UPDATE_PERIOD = 60
 
     def __init__(self, command, subprocess, success_codes=None):
