@@ -1,3 +1,9 @@
+mastermind-minion (1.41) xenial; urgency=medium
+
+  * Basic support for eblob_kit command
+
+ -- Alex Karev <karapuz@yandex-team.ru>  Fri, 18 Jan 2019 13:30:12 +0300
+
 mastermind-minion (1.40) xenial; urgency=medium
 
   * Change OUTPUT_WINDOW_SIZE to 4Kb
