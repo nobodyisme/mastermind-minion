@@ -1,3 +1,9 @@
+mastermind-minion (1.42) xenial; urgency=medium
+
+  * Add log_file for eblob_kit command
+
+ -- Evgeny Avramenko <kanst9@yandex-team.ru>  Mon, 04 Feb 2019 15:14:37 +0300
+
 mastermind-minion (1.41) xenial; urgency=medium
 
   * Basic support for eblob_kit command

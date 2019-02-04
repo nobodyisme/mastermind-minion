@@ -21,6 +21,7 @@ from minion.subprocess.base_shell import BaseSubprocess
 
 
 OUTPUT_PARAM = 'json-file'
+LOG_PARAM = 'log-file'
 
 
 class ResultFields(object):
@@ -46,6 +47,9 @@ class EblobKitSubprocess(BaseSubprocess):
 
         if OUTPUT_PARAM in self.params:
             cmd.extend(['--json-file', self.params[OUTPUT_PARAM]])
+
+        if LOG_PARAM in self.params:
+            cmd.extend(['--log-file', self.params[LOG_PARAM]])
 
         subcommand = self.params[ResultFields.SUB_CMD]
         if subcommand == 'fix':
